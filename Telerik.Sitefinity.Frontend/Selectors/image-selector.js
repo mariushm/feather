@@ -3,17 +3,19 @@
     var selectors = angular.module('selectors');
 
     /*
-     * The main controller of the Image Selector.
+     * This directive represents the Sitefinity Image Selector.
      */
-    selectors.controller('sfImageSelectorCtrl', ['$scope', function ($scope) {
+    selectors.directive('sfImageSelector', ['serverContext', function (serverContext) {
 
-        $scope.cancel = function () {
-            $scope.$modalInstance.close();
-        };
-
-        $scope.saveChanges = function () {
+        var link = function ($scope, element, attributes) {
 
         };
+
+        return {
+            restrict: 'E',
+            link: link,
+            templateUrl: serverContext.getEmbeddedResourceUrl('Telerik.Sitefinity.Frontend', 'Selectors/image-selector.html')
+        }
 
     }]);
 
@@ -25,7 +27,7 @@
 
         var link = function ($scope, element, attributes) {
 
-            var selectorTemplate = serverContext.getEmbeddedResourceUrl('Telerik.Sitefinity.Frontend', 'Selectors/image-selector.html'),
+            var selectorTemplate = serverContext.getEmbeddedResourceUrl('Telerik.Sitefinity.Frontend', 'Selectors/image-selector-modal.html'),
                 directiveMarkup = '<div modal existing-scope="true" window-class="sf-image-selector-dlg" template-url="' + selectorTemplate + '"></div>',
                 modalDirective = $compile(directiveMarkup)($scope);
 
@@ -38,6 +40,20 @@
             $scope.open = function () {
                 angular.element(modalElement).scope().$openModalDialog();
             };
+
+            /*
+             * Cancels the operation and closes the modal window.
+             */
+            $scope.cancel = function () {
+                $scope.$modalInstance.close();
+            }
+
+            /*
+             * Saves the changes and returns the selected image?!
+             */
+            //$scope.saveChanges = function () {
+
+            //};
 
         };
 

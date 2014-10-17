@@ -81,6 +81,8 @@
                 closeActiveDialog();
                 return reason;
             });
+
+            return modalInstance;
         };
 
         return {
@@ -91,7 +93,7 @@
                 }
                 else {
                     scope.$openModalDialog = function () {
-                            open(scope, attrs);
+                        return open(scope, attrs);
                     };
                 }
             }

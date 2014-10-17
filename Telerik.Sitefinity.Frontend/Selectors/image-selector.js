@@ -15,6 +15,10 @@
                 $scope.$emit('imageSelected', newValue);
             });
 
+            $scope.$emit('needsImage', function (e) {
+                $scope.text = e;
+            });
+
         };
 
         return {
@@ -36,7 +40,8 @@
 
             var selectorTemplate = serverContext.getEmbeddedResourceUrl('Telerik.Sitefinity.Frontend', 'Selectors/image-selector-modal.html'),
                 directiveMarkup = '<div modal existing-scope="true" window-class="sf-image-selector-dlg" template-url="' + selectorTemplate + '"></div>',
-                modalDirective = $compile(directiveMarkup)($scope);
+                modalDirective = $compile(directiveMarkup)($scope),
+                editMarkup;
 
             // appends the compiled modal directive 
             var modalElement = $(element).append(modalDirective);
@@ -48,11 +53,16 @@
                 selectedImage = arg;
             })
 
+            $scope.$on('needsImage', function (ev, arg) {
+                arg(editMarkup);
+            });
+
             /*
              * Opens the image selector modal dialog.
              */
-            $scope.open = function () {
-                angular.element(modalElement).scope().$openModalDialog();
+            $scope.open = function (markup) {
+                editMarkup = markup;
+                var dialog = angular.element(modalElement).scope().$openModalDialog();
             };
 
             /*

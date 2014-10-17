@@ -2,14 +2,24 @@
 
     var selectors = angular.module('selectors');
 
-    selectors.directive('sfImageSelectorModal', function () {
+    selectors.directive('sfImageSelectorModal', ['$compile', 'serverContext', function ($compile, serverContext) {
 
         var link = function ($scope, element, attributes) {
-            $(element).append('<div>')
-                      .attr('modal', '')
-                      .attr('existing-scope', 'true')
-                      .attr('window-class', 'sf-image-selector-dlg')
-                      .attr('template-url', 'Selectors/image-selector.html');
+
+            var selectorTemplate = serverContext.getEmbeddedResourceUrl('Telerik.Sitefinity.Frontend', 'Selectors/image-selector.html'),
+                directiveMarkup = '<div modal existing-scope="true" window-class="sf-image-selector-dlg" template-url="' + selectorTemplate + '"></div>',
+                modalDirective = $compile(directiveMarkup)($scope);
+
+            // appends the compiled modal directive 
+            var modalElement = $(element).append(modalDirective);
+
+            /*
+             * Opens the image selector modal dialog.
+             */
+            $scope.open = function () {
+                angular.element(modalElement).scope().$openModalDialog();
+            };
+
         };
 
         return {
@@ -17,7 +27,7 @@
             link: link
         };
 
-    });
+    }]);
 
     /*
      * Image Selector Button directive is a thin wrapper around
@@ -36,7 +46,7 @@
             }
 
             $(element).bind('click', function () {
-                alert('Opening Image Selector...');
+                angular.element(modal).scope().open();
             });
 
         };

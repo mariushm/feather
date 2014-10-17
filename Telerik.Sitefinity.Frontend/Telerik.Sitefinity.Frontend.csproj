@@ -423,6 +423,7 @@
     <EmbeddedResource Include="Mvc\Scripts\Templates\style-dropdown.html" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Selectors\image-selector.html" />
     <EmbeddedResource Include="Selectors\image-selector.js" />
     <EmbeddedResource Include="assets\dist\css\sitefinity-backend.css" />
     <EmbeddedResource Include="assets\dist\css\sitefinity-backend.min.css" />

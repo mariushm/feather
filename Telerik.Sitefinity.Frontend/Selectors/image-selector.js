@@ -3,20 +3,43 @@
     var selectors = angular.module('selectors');
 
     /*
+     * Provides functionality for the list mode of the image selector.
+     */
+    selectors.controller('sfImageSelectorListCtrl', ['$scope', function ($scope) {
+
+    }]);
+
+    /*
+     * Provides functionality for the upload mode of the image selector.
+     */
+    selectors.controller('sfImageSelectorUploadCtrl', ['$scope', function ($scope) {
+
+    }]);
+
+    /*
+     * Provides functionality for the insert mode of the image selector.
+     */
+    selectors.controller('sfImageSelectorInsertCtrl', ['$scope', function ($scope) {
+
+    }]);
+
+    /*
      * This directive represents the Sitefinity Image Selector.
      */
     selectors.directive('sfImageSelector', ['serverContext', function (serverContext) {
 
         var imageSelectorController = function ($scope) {
 
-            $scope.text = "Initial";
+            $scope.modes = {
+                LIST_MODE: 'list',
+                UPLOAD_MODE: 'upload',
+                INSERT_MODE: 'insert'
+            };
 
-            $scope.$watch('text', function (newValue, oldValue) {
-                $scope.$emit('imageSelected', newValue);
-            });
+            $scope.activeMode = $scope.modes.LIST_MODE;
 
             $scope.$emit('needsImage', function (e) {
-                $scope.text = e;
+                
             });
 
         };

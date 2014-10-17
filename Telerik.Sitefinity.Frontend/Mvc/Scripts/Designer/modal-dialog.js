@@ -47,7 +47,12 @@
 
             dialogsService.increaseDialogsCount();
 
-            scope.$modalInstance.result.finally(function () {
+            /*
+             * Closes the active dialog and shows the one that
+             * was opened before it.
+             */
+            var closeActiveDialog = function () {
+
                 dialogsService.decreaseDialogsCount();
 
                 $('.' + attrs.windowClass).remove();
@@ -58,8 +63,23 @@
                 }
                 else {
                     $(backdropClass).remove();
-                }                
+                }
+            }
 
+            /*
+             * Subscribe to the promise of a result, but don't do it
+             * in the final fashion. We want to allow the chaining of the
+             * promises so that functionality down the line can act once
+             * the dialog is closed.
+             */
+            scope.$modalInstance.result.then(function (result) {
+                // resolved
+                closeActiveDialog();
+                return result;
+            }, function (reason) {
+                // rejected
+                closeActiveDialog();
+                return reason;
             });
         };
 

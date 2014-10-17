@@ -7,14 +7,21 @@
      */
     selectors.directive('sfImageSelector', ['serverContext', function (serverContext) {
 
-        var link = function ($scope, element, attributes) {
+        var imageSelectorController = function ($scope) {
+
+            $scope.text = "Initial";
+
+            $scope.$watch('text', function (newValue, oldValue) {
+                $scope.$emit('imageSelected', newValue);
+            });
 
         };
 
         return {
             restrict: 'E',
-            link: link,
-            templateUrl: serverContext.getEmbeddedResourceUrl('Telerik.Sitefinity.Frontend', 'Selectors/image-selector.html')
+            scope: {},
+            templateUrl: serverContext.getEmbeddedResourceUrl('Telerik.Sitefinity.Frontend', 'Selectors/image-selector.html'),
+            controller: imageSelectorController
         }
 
     }]);
@@ -23,7 +30,7 @@
      * Image Selector Modal directive wraps the Image selector in a modal dialog. It is a 
      * convenience thin wrapper which can be used to open the Image Selector in a modal dialog.
      */
-    selectors.directive('sfImageSelectorModal', ['$compile', 'serverContext', function ($compile, serverContext) {
+    selectors.directive('sfImageSelectorModal', ['$compile', '$parse', 'serverContext', function ($compile, $parse, serverContext) {
 
         var link = function ($scope, element, attributes) {
 
@@ -33,6 +40,13 @@
 
             // appends the compiled modal directive 
             var modalElement = $(element).append(modalDirective);
+
+            // holds the value of the image that has been selected through the image selector
+            var selectedImage;
+
+            $scope.$on('imageSelected', function (ev, arg) {
+                selectedImage = arg;
+            })
 
             /*
              * Opens the image selector modal dialog.
@@ -48,12 +62,18 @@
                 $scope.$modalInstance.close();
             }
 
+            // sfOnSelected
+
             /*
              * Saves the changes and returns the selected image?!
+             * TODO: This seems to be awkwardly named by UX team; think of naming it better.
              */
-            //$scope.saveChanges = function () {
-
-            //};
+            $scope.saveChanges = function () {
+                $scope.$modalInstance.result.then(function (e) {
+                    $(element).trigger('imageSelected', e);
+                });
+                $scope.$modalInstance.close(selectedImage);
+            };
 
         };
 

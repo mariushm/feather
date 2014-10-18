@@ -10,22 +10,40 @@
     modes[LIST_MODE] = {
         name: LIST_MODE,
         title: 'Select image',
-        okButton: 'Done',
-        cancelButton: 'Cancel'
+        okButton: {
+            title: 'Done',
+            raise: 'DoneSelecting'
+        },
+        cancelButton: {
+            title: 'Cancel',
+            raise: 'CancelSelect'
+        }
     };
 
     modes[UPLOAD_MODE] = {
         name: UPLOAD_MODE,
         title: 'Upload image',
-        okButton: 'Upload',
-        cancelButton: 'Cancel'
+        okButton: {
+            title: 'Upload',
+            raise: 'UploadImage'
+        },
+        cancelButton: {
+            title: 'Cancel',
+            raise: 'CancelUpload'
+        }
     };
 
     modes[INSERT_MODE] = {
         name: INSERT_MODE,
         title: 'Image',
-        okButton: 'Done',
-        cancelButton: 'Cancel'
+        okButton: {
+            title: 'Done',
+            raise: 'InsertImage'
+        },
+        cancelButton: {
+            title: 'Cancel',
+            raise: 'CancelInsert'
+        }
     };
 
     /*
@@ -47,6 +65,14 @@
 
         // represents the HTML File object to be uploaded
         $scope.file = null;
+
+        // subscribes to the event that cancels upload
+        $scope.$on(modes[UPLOAD_MODE].cancelButton.raise, function (ev, args) {
+            // set the file to upload to null
+            $scope.$parent.file = null;
+            // go back to the list mode
+            $scope.$parent.activeMode = modes[LIST_MODE];
+        });
 
         $scope.$parent.$watch('file', function (newValue, oldValue) {
             $scope.file = newValue;
@@ -155,10 +181,10 @@
             };
 
             /*
-             * Cancels the operation and closes the modal window.
+             * Raise the cancel event of the current mode
              */
             $scope.cancel = function () {
-                $scope.$modalInstance.close();
+                $scope.$broadcast($scope.mode.cancelButton.raise);
             }
 
             // sfOnSelected

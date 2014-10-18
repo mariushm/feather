@@ -40,7 +40,8 @@
                 scope: attrs.existingScope && scope,
                 templateUrl: attrs.templateUrl,
                 controller: resolveControllerName(attrs),
-                windowClass: attrs.windowClass
+                windowClass: attrs.windowClass,
+                size: attrs.size
             });
 
             scope.$modalInstance = modalInstance;

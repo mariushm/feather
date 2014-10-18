@@ -1,14 +1,41 @@
 ﻿<!-- LIST MODE -->
 <div ng-controller="sfImageSelectorListCtrl" ng-show="activeMode === modes.LIST_MODE">
-    List
+    <div class="row">
+        <div class="col-md-8">
+            
+            <div class="text-center">
+                <button type="button" class="btn btn-link" ng-click="selectFile()">
+                    Select image from your computer
+                </button>
+                <br />
+                <small>or simply drag &amp; drop it here</small>
+            </div>
+
+        </div>
+        <div class="col-md-4">
+            <ul>
+                <li>Upload image</li>
+                <li>Already uploaded images</li>
+                <li>Recent images</li>
+                <li>My images</li>
+                <li>All images</li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 <!-- UPLOAD MODE -->
 <div ng-controller="sfImageSelectorUploadCtrl" ng-show="activeMode === modes.UPLOAD_MODE">
-    Upload
+    <h3>Upload</h3> 
 </div>
 
 <!-- INSERT MODE -->
 <div ng-controller="sfImageSelectorInsertCtrl" ng-show="activeMode === modes.INSERT_MODE">
-    Insert
+    <h3>Insert</h3>
 </div>
+
+<!--
+    Uploader is not part of any of the modes as different modes use it, so in a way
+    think of it as a shared component between the modes.
+-->
+<input id="fileUpload" type="file" sf-image-selector-uploader style="display:none;" />

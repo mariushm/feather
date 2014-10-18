@@ -2,10 +2,19 @@
 
     var selectors = angular.module('selectors');
 
+    var LIST_MODE = 'list',
+        UPLOAD_MODE = 'upload',
+        INSERT_MODE = 'insert'
+
     /*
      * Provides functionality for the list mode of the image selector.
      */
     selectors.controller('sfImageSelectorListCtrl', ['$scope', function ($scope) {
+
+        // Event handler fired by the button for selecting a file manually.
+        $scope.selectFile = function () {
+            $scope.$emit('doSelectFile');
+        };
 
     }]);
 
@@ -31,15 +40,19 @@
         var imageSelectorController = function ($scope) {
 
             $scope.modes = {
-                LIST_MODE: 'list',
-                UPLOAD_MODE: 'upload',
-                INSERT_MODE: 'insert'
+                LIST_MODE: LIST_MODE,
+                UPLOAD_MODE: UPLOAD_MODE,
+                INSERT_MODE: INSERT_MODE
             };
 
             $scope.activeMode = $scope.modes.LIST_MODE;
 
             $scope.$emit('needsImage', function (e) {
                 
+            });
+
+            $scope.$on('changeMode', function (ev, arg) {
+                $scope.activeMode = arg;
             });
 
         };
@@ -62,7 +75,7 @@
         var link = function ($scope, element, attributes) {
 
             var selectorTemplate = serverContext.getEmbeddedResourceUrl('Telerik.Sitefinity.Frontend', 'Selectors/image-selector-modal.html'),
-                directiveMarkup = '<div modal existing-scope="true" window-class="sf-image-selector-dlg" template-url="' + selectorTemplate + '"></div>',
+                directiveMarkup = '<div modal existing-scope="true" window-class="sf-image-selector-dlg" template-url="' + selectorTemplate + '" size="lg"></div>',
                 modalDirective = $compile(directiveMarkup)($scope),
                 editMarkup;
 
@@ -146,6 +159,22 @@
         };
 
     });
-        
+    
+    selectors.directive('sfImageSelectorUploader', function () {
+
+        var link = function ($scope, element, attributes) {
+
+            $scope.$on('doSelectFile', function () {
+                $(element).click();
+            });
+
+        };
+
+        return {
+            restrict: 'A',
+            link: link
+        };
+
+    });
 
 }());

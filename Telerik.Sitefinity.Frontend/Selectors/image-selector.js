@@ -55,6 +55,23 @@
                 $scope.activeMode = arg;
             });
 
+            /*
+             * Represents a file that has been selected for uploading
+             * but has not yet been uploaded.
+             */
+            $scope.file = null;
+
+            /*
+             * If the file field has been changed to something else than null,
+             * it means we have a pending upload and we should switch the mode
+             * of the ImageSelector to upload mode.
+             */
+            $scope.$watch('file', function (newValue, oldValue) {
+                if (newValue) {
+                    $scope.activeMode = UPLOAD_MODE;
+                }
+            });
+
         };
 
         return {
@@ -130,13 +147,31 @@
 
     }]);
     
-    
+
+    /*
+     * This directive enhances the standard HTML5 file upload (input element) with additional functionality needed
+     * by the ImageSelector. This directive is not to be reused outside of ImageSelector as it has a very narrow
+     * functionality and design.
+     */
     selectors.directive('sfImageSelectorUploader', function () {
 
         var link = function ($scope, element, attributes) {
+            
+            // Handles the change event (a file has been selected) of the [input type="file"]
+            $(element).change(function (ev) {
+                $scope.$apply(function () {
+                    // TODO: add validation here if there are no files
+                    $scope.file = element.get(0).files[0];
+                });
+            });
 
+            // Open the [input type="file"] choose file dialog. This event could be triggered by
+            // various actions in the other controllers.
             $scope.$on('doSelectFile', function () {
-                $(element).click();
+                // call the click event in a timeout to avoid digest loop
+                setTimeout(function () {
+                    $(element).click();
+                }, 0);
             });
 
         };

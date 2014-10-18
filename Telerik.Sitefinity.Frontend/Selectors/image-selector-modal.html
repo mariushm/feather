@@ -1,10 +1,10 @@
 ﻿<div class="modal-header">
-    <h3 class="modal-title">Select image</h3>
+    <h3 class="modal-title">{{ mode.title }}</h3>
 </div>
 <div class="modal-body">
     <sf-image-selector></sf-image-selector>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-primary pull-left" ng-click="saveChanges()">Save changes</button>
-    <button type="button" class="btn btn-link pull-left" ng-click="cancel()">Cancel</button>
+    <button type="button" class="btn btn-primary pull-left" ng-click="saveChanges()">{{ mode.okButton }}</button>
+    <button type="button" class="btn btn-link pull-left" ng-click="cancel()">{{ mode.cancelButton }}</button>
 </div>

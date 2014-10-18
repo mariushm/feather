@@ -6,6 +6,28 @@
         UPLOAD_MODE = 'upload',
         INSERT_MODE = 'insert'
 
+    var modes = [];
+    modes[LIST_MODE] = {
+        name: LIST_MODE,
+        title: 'Select image',
+        okButton: 'Done',
+        cancelButton: 'Cancel'
+    };
+
+    modes[UPLOAD_MODE] = {
+        name: UPLOAD_MODE,
+        title: 'Upload image',
+        okButton: 'Upload',
+        cancelButton: 'Cancel'
+    };
+
+    modes[INSERT_MODE] = {
+        name: INSERT_MODE,
+        title: 'Image',
+        okButton: 'Done',
+        cancelButton: 'Cancel'
+    };
+
     /*
      * Provides functionality for the list mode of the image selector.
      */
@@ -46,22 +68,12 @@
 
         var imageSelectorController = function ($scope) {
 
-            $scope.modes = {
-                LIST_MODE: LIST_MODE,
-                UPLOAD_MODE: UPLOAD_MODE,
-                INSERT_MODE: INSERT_MODE
-            };
-
-            $scope.activeMode = $scope.modes.LIST_MODE;
+            $scope.activeMode = modes[LIST_MODE];
 
             $scope.$emit('needsImage', function (e) {
                 
             });
-
-            $scope.$on('changeMode', function (ev, arg) {
-                $scope.activeMode = arg;
-            });
-
+            
             /*
              * Represents a file that has been selected for uploading
              * but has not yet been uploaded.
@@ -75,8 +87,16 @@
              */
             $scope.$watch('file', function (newValue, oldValue) {
                 if (newValue) {
-                    $scope.activeMode = UPLOAD_MODE;
+                    $scope.activeMode = modes[UPLOAD_MODE];
                 }
+            });
+
+            /*
+             * Watches the active mode in order to be able to emit an event
+             * when mode has changed.
+             */
+            $scope.$watch('activeMode', function (newValue, oldValue) {
+                $scope.$emit('modeChanged', newValue);
             });
 
         };
@@ -115,6 +135,15 @@
 
             $scope.$on('needsImage', function (ev, arg) {
                 arg(editMarkup);
+            });
+
+            // Represents the current mode of the Image Selector
+            $scope.mode = modes[LIST_MODE];
+
+            // Subscribes to the modeChanged event which is fired by the [child] ImageSelector
+            // controller
+            $scope.$on('modeChanged', function (ev, newMode) {
+                $scope.mode = newMode;
             });
 
             /*

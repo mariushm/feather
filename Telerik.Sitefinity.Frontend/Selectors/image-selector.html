@@ -1,5 +1,5 @@
 ﻿<!-- LIST MODE -->
-<div ng-controller="sfImageSelectorListCtrl" ng-show="activeMode === modes.LIST_MODE">
+<div ng-controller="sfImageSelectorListCtrl" ng-show="activeMode.name === 'list'">
     <div class="row">
         <div class="col-md-8">
             
@@ -25,7 +25,7 @@
 </div>
 
 <!-- UPLOAD MODE -->
-<div ng-controller="sfImageSelectorUploadCtrl" ng-show="activeMode === modes.UPLOAD_MODE">
+<div ng-controller="sfImageSelectorUploadCtrl" ng-show="activeMode.name === 'upload'">
     <form role="form">
         <div class="form-group">
             <label for="fileName">Image to upload</label>
@@ -37,7 +37,7 @@
 </div>
 
 <!-- INSERT MODE -->
-<div ng-controller="sfImageSelectorInsertCtrl" ng-show="activeMode === modes.INSERT_MODE">
+<div ng-controller="sfImageSelectorInsertCtrl" ng-show="activeMode.name === 'insert'">
     <h3>Insert</h3>
 </div>
 

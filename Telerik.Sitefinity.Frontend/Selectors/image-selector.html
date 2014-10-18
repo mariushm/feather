@@ -26,7 +26,14 @@
 
 <!-- UPLOAD MODE -->
 <div ng-controller="sfImageSelectorUploadCtrl" ng-show="activeMode === modes.UPLOAD_MODE">
-    <h3>Upload</h3> 
+    <form role="form">
+        <div class="form-group">
+            <label for="fileName">Image to upload</label>
+            <div id="fileName">
+                {{ file.name }}
+            </div>
+        </div>
+    </form>
 </div>
 
 <!-- INSERT MODE -->

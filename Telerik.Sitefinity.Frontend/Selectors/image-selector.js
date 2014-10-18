@@ -23,6 +23,13 @@
      */
     selectors.controller('sfImageSelectorUploadCtrl', ['$scope', function ($scope) {
 
+        // represents the HTML File object to be uploaded
+        $scope.file = null;
+
+        $scope.$parent.$watch('file', function (newValue, oldValue) {
+            $scope.file = newValue;
+        });
+
     }]);
 
     /*

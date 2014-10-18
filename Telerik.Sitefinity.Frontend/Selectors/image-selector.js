@@ -129,36 +129,7 @@
         };
 
     }]);
-
-    /*
-     * Image Selector Button directive is used together with the Image Selector Modal
-     * for the cases when the Image Selector should be opened on the button click and
-     * it should be open in a modal dialog.
-     *
-     * To use this directive set the the value of the sf-image-selector-button attribute
-     * to jQuery selector of the sf-image-selector-modal element.
-     */
-    selectors.directive('sfImageSelectorButton', function () {
-
-        var link = function ($scope, element, attributes) {
-
-            var modal = attributes.sfImageSelectorButton;
-            if (!modal) {
-                throw 'You must specify the selector for the sf-image-selector-modal element.';
-            }
-
-            $(element).bind('click', function () {
-                angular.element(modal).scope().open();
-            });
-
-        };
-
-        return {
-            restrict: 'A',
-            link: link
-        };
-
-    });
+    
     
     selectors.directive('sfImageSelectorUploader', function () {
 

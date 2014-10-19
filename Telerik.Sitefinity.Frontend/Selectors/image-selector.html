@@ -25,8 +25,8 @@
 </div>
 
 <!-- UPLOAD MODE -->
-<div ng-controller="sfImageSelectorUploadCtrl" ng-show="activeMode.name === 'upload'">
-    <form role="form">
+<div ng-controller="sfImageSelectorUploadCtrl" ng-show="activeMode.name === 'upload' || activeMode.name === 'uploading'">
+    <form role="form" ng-show="activeMode.name === 'upload'">
         <div class="form-group">
             <label for="fileName">Image to upload</label>
             <div id="fileName">
@@ -34,6 +34,9 @@
             </div>
         </div>
     </form>
+    <div ng-show="activeMode.name === 'uploading'">
+        Uploading...
+    </div>
 </div>
 
 <!-- INSERT MODE -->

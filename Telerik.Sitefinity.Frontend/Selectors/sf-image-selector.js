@@ -6,6 +6,7 @@
 
     var LIST_MODE = 'list',
         UPLOAD_MODE = 'upload',
+        UPLOADING_MODE = 'uploading',
         INSERT_MODE = 'insert';
 
     var modes = [];
@@ -32,6 +33,15 @@
         cancelButton: {
             title: 'Cancel',
             raise: 'CancelUpload'
+        }
+    };
+
+    modes[UPLOADING_MODE] = {
+        name: UPLOADING_MODE,
+        title: 'Upload image',
+        cancelButton: {
+            title: 'Cancel',
+            raise: 'CancelUploading'
         }
     };
 
@@ -70,6 +80,10 @@
 
         // subscribe to the event that starts upload
         $scope.$on(modes[UPLOAD_MODE].okButton.raise, function (ev, args) {
+
+            // set the active mode to uploading
+            $scope.$parent.activeMode = modes[UPLOADING_MODE];
+
             sfImageService.upload($scope.file).then(
                 // success
                 function (contentItem) {

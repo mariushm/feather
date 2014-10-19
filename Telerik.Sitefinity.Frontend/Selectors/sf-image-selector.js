@@ -73,7 +73,7 @@
             sfImageService.upload($scope.file).then(
                 // success
                 function (contentItem) {
-                    $scope.$parent.selectedImage = contentItem;
+                    $scope.$parent.image = contentItem;
                 },
                 // failure
                 function (error) {
@@ -98,7 +98,16 @@
     /*
      * Provides functionality for the insert mode of the image selector.
      */
-    imageSelector.controller('sfImageSelectorInsertCtrl', ['$scope', function ($scope) {
+    imageSelector.controller('sfImageSelectorInsertCtrl', ['$scope', '$interpolate', function ($scope, $interpolate) {
+
+        // subscribe to the event that inserts an image
+        $scope.$on(modes[INSERT_MODE].okButton.raise, function (ev, args) {
+
+            var markup = '<img src="{{ ContentUrl }}" />';
+            markup = $interpolate(markup)($scope.image);
+            $scope.$emit('imageSelected', markup);
+
+        });
 
     }]);
 
@@ -118,10 +127,10 @@
             /*
              * Represents the image user has selected. This selection
              * can happen in several ways (clicks on the image, upload has completed
-             * successfully...). The selectedImage is a JSON representation of Sitefinity
+             * successfully...). The image is a JSON representation of Sitefinity
              * Image (based on Content type).
              */
-            $scope.selectedImage = null;
+            $scope.image = null;
 
             /*
              * Represents a file that has been selected for uploading
@@ -141,11 +150,11 @@
             });
 
             /*
-             * If the selectedImage field has been changed to something else
+             * If the image field has been changed to something else
              * than null, it means user has selected an image and we should
              * switch the mode of the ImageSelector to insert mode.
              */
-            $scope.$watch('selectedImage', function (newValue, oldValue) {
+            $scope.$watch('image', function (newValue, oldValue) {
                 if (newValue) {
                     $scope.activeMode = modes[INSERT_MODE];
                 }
@@ -158,6 +167,8 @@
             $scope.$watch('activeMode', function (newValue, oldValue) {
                 $scope.$emit('modeChanged', newValue);
             });
+
+            $scope.$on('image')
 
         };
 
@@ -186,13 +197,6 @@
             // appends the compiled modal directive 
             var modalElement = $(element).append(modalDirective);
 
-            // holds the value of the image that has been selected through the image selector
-            var selectedImage;
-
-            $scope.$on('imageSelected', function (ev, arg) {
-                selectedImage = arg;
-            })
-
             $scope.$on('needsImage', function (ev, arg) {
                 arg(editMarkup);
             });
@@ -204,6 +208,13 @@
             // controller
             $scope.$on('modeChanged', function (ev, newMode) {
                 $scope.mode = newMode;
+            });
+
+            $scope.$on('imageSelected', function (ev, args) {
+                $scope.$modalInstance.result.then(function (e) {
+                    $(element).trigger('imageSelected', e);
+                });
+                $scope.$modalInstance.close(args);
             });
 
             /*

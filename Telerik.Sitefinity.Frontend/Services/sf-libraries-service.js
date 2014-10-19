@@ -76,7 +76,7 @@
                     xhr.onload = function (e) {
                         if (xhr.readyState === 4) {
                             if (xhr.status === 200) {
-                                deferred.resolve(content);
+                                deferred.resolve(JSON.parse(xhr.responseText)[0]);
                             } else {
                                 deferred.reject(xhr.statusText);
                             }

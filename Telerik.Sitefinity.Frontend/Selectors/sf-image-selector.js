@@ -6,7 +6,7 @@
 
     var LIST_MODE = 'list',
         UPLOAD_MODE = 'upload',
-        INSERT_MODE = 'insert'
+        INSERT_MODE = 'insert';
 
     var modes = [];
     modes[LIST_MODE] = {
@@ -168,8 +168,6 @@
                 $scope.$emit('modeChanged', newValue);
             });
 
-            $scope.$on('image')
-
         };
 
         return {
@@ -177,7 +175,7 @@
             scope: {},
             templateUrl: serverContext.getEmbeddedResourceUrl('Telerik.Sitefinity.Frontend', 'Selectors/image-selector.html'),
             controller: imageSelectorController
-        }
+        };
 
     }]);
 
@@ -227,7 +225,7 @@
 
             $scope.command = function (cmd) {
                 $scope.$broadcast(cmd);
-            }
+            };
 
         };
 

@@ -65,7 +65,7 @@
                 else {
                     $(backdropClass).remove();
                 }
-            }
+            };
 
             /*
              * Subscribe to the promise of a result, but don't do it

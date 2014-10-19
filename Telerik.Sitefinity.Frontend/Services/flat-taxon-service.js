@@ -6,8 +6,11 @@
                 dataItemPromise;
 
             var getResource = function (taxonomyId, taxonId) {
+
+                var url = '';
+
                 if (taxonomyId && taxonomyId !== "") {
-                    var url = serviceUrl + taxonomyId + '/';
+                    url = serviceUrl + taxonomyId + '/';
 
                     if (taxonId && taxonId !== "") {
                         url = url + taxonId + '/';

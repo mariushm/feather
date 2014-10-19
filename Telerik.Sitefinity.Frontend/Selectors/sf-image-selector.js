@@ -1,5 +1,7 @@
 ﻿; (function () {
 
+    var imageSelector = angular.module('sfImageSelector', ['sfLibrariesService']);
+
     var selectors = angular.module('selectors');
 
     var LIST_MODE = 'list',
@@ -49,7 +51,7 @@
     /*
      * Provides functionality for the list mode of the image selector.
      */
-    selectors.controller('sfImageSelectorListCtrl', ['$scope', function ($scope) {
+    imageSelector.controller('sfImageSelectorListCtrl', ['$scope', function ($scope) {
 
         // Event handler fired by the button for selecting a file manually.
         $scope.selectFile = function () {
@@ -61,10 +63,15 @@
     /*
      * Provides functionality for the upload mode of the image selector.
      */
-    selectors.controller('sfImageSelectorUploadCtrl', ['$scope', function ($scope) {
+    imageSelector.controller('sfImageSelectorUploadCtrl', ['$scope', 'sfImageService', function ($scope, sfImageService) {
 
         // represents the HTML File object to be uploaded
         $scope.file = null;
+
+        // subscribe to the event that starts upload
+        $scope.$on(modes[UPLOAD_MODE].okButton.raise, function (ev, args) {
+            sfImageService.upload($scope.file);
+        });
 
         // subscribes to the event that cancels upload
         $scope.$on(modes[UPLOAD_MODE].cancelButton.raise, function (ev, args) {
@@ -83,14 +90,14 @@
     /*
      * Provides functionality for the insert mode of the image selector.
      */
-    selectors.controller('sfImageSelectorInsertCtrl', ['$scope', function ($scope) {
+    imageSelector.controller('sfImageSelectorInsertCtrl', ['$scope', function ($scope) {
 
     }]);
 
     /*
      * This directive represents the Sitefinity Image Selector.
      */
-    selectors.directive('sfImageSelector', ['serverContext', function (serverContext) {
+    imageSelector.directive('sfImageSelector', ['serverContext', function (serverContext) {
 
         var imageSelectorController = function ($scope) {
 
@@ -140,7 +147,7 @@
      * Image Selector Modal directive wraps the Image selector in a modal dialog. It is a 
      * convenience thin wrapper which can be used to open the Image Selector in a modal dialog.
      */
-    selectors.directive('sfImageSelectorModal', ['$compile', '$parse', 'serverContext', function ($compile, $parse, serverContext) {
+    imageSelector.directive('sfImageSelectorModal', ['$compile', '$parse', 'serverContext', function ($compile, $parse, serverContext) {
 
         var link = function ($scope, element, attributes) {
 
@@ -180,25 +187,9 @@
                 var dialog = angular.element(modalElement).scope().$openModalDialog();
             };
 
-            /*
-             * Raise the cancel event of the current mode
-             */
-            $scope.cancel = function () {
-                $scope.$broadcast($scope.mode.cancelButton.raise);
+            $scope.command = function (cmd) {
+                $scope.$broadcast(cmd);
             }
-
-            // sfOnSelected
-
-            /*
-             * Saves the changes and returns the selected image?!
-             * TODO: This seems to be awkwardly named by UX team; think of naming it better.
-             */
-            $scope.saveChanges = function () {
-                $scope.$modalInstance.result.then(function (e) {
-                    $(element).trigger('imageSelected', e);
-                });
-                $scope.$modalInstance.close(selectedImage);
-            };
 
         };
 
@@ -215,7 +206,7 @@
      * by the ImageSelector. This directive is not to be reused outside of ImageSelector as it has a very narrow
      * functionality and design.
      */
-    selectors.directive('sfImageSelectorUploader', function () {
+    imageSelector.directive('sfImageSelectorUploader', function () {
 
         var link = function ($scope, element, attributes) {
             

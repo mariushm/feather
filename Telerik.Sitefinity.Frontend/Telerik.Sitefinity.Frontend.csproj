@@ -423,9 +423,10 @@
     <EmbeddedResource Include="Mvc\Scripts\Templates\style-dropdown.html" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Services\sf-libraries-service.js" />
     <EmbeddedResource Include="Selectors\image-selector-modal.html" />
     <EmbeddedResource Include="Selectors\image-selector.html" />
-    <EmbeddedResource Include="Selectors\image-selector.js" />
+    <EmbeddedResource Include="Selectors\sf-image-selector.js" />
     <EmbeddedResource Include="assets\dist\css\sitefinity-backend.css" />
     <EmbeddedResource Include="assets\dist\css\sitefinity-backend.min.css" />
     <EmbeddedResource Include="assets\fonts\glyphicons-halflings-regular.svg" />

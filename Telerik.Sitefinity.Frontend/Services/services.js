@@ -1,6 +1,23 @@
 ﻿(function () {
     var module = angular.module('services', ['ngResource']);
 
+    /*
+     * Useful prototype functions used by the services.
+     */
+
+    // Converts date to a WCF JSON date
+    Date.prototype.toWcfDate = function () {
+        return '/Date(' + this.getTime() + '-0000)/';
+    };
+
+    // Converts WCF date string to a JavaScript date
+    String.prototype.fromWcfDate = function () {
+        var matches = this.match(/\/Date\(([0-9]+)(?:.*)\)\//);
+        if (matches)
+            return new Date(parseInt(matches[1]));
+    };
+
+
     module.config(['$httpProvider', function($httpProvider) {
         if (!$httpProvider.defaults.headers.get) {
             $httpProvider.defaults.headers.get = {};    

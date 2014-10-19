@@ -5,6 +5,6 @@
     <sf-image-selector></sf-image-selector>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-primary pull-left" ng-click="saveChanges()">{{ mode.okButton.title }}</button>
-    <button type="button" class="btn btn-link pull-left" ng-click="cancel()">{{ mode.cancelButton.title }}</button>
+    <button type="button" class="btn btn-primary pull-left" ng-click="command(mode.okButton.raise)">{{ mode.okButton.title }}</button>
+    <button type="button" class="btn btn-link pull-left" ng-click="command(mode.cancelButton.raise)">{{ mode.cancelButton.title }}</button>
 </div>

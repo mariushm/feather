@@ -70,7 +70,15 @@
 
         // subscribe to the event that starts upload
         $scope.$on(modes[UPLOAD_MODE].okButton.raise, function (ev, args) {
-            sfImageService.upload($scope.file);
+            sfImageService.upload($scope.file).then(
+                // success
+                function (contentItem) {
+                    $scope.$parent.selectedImage = contentItem;
+                },
+                // failure
+                function (error) {
+                    // TODO: handle the upload errors here
+                });
         });
 
         // subscribes to the event that cancels upload
@@ -108,6 +116,14 @@
             });
             
             /*
+             * Represents the image user has selected. This selection
+             * can happen in several ways (clicks on the image, upload has completed
+             * successfully...). The selectedImage is a JSON representation of Sitefinity
+             * Image (based on Content type).
+             */
+            $scope.selectedImage = null;
+
+            /*
              * Represents a file that has been selected for uploading
              * but has not yet been uploaded.
              */
@@ -121,6 +137,17 @@
             $scope.$watch('file', function (newValue, oldValue) {
                 if (newValue) {
                     $scope.activeMode = modes[UPLOAD_MODE];
+                }
+            });
+
+            /*
+             * If the selectedImage field has been changed to something else
+             * than null, it means user has selected an image and we should
+             * switch the mode of the ImageSelector to insert mode.
+             */
+            $scope.$watch('selectedImage', function (newValue, oldValue) {
+                if (newValue) {
+                    $scope.activeMode = modes[INSERT_MODE];
                 }
             });
 

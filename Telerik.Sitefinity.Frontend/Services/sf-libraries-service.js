@@ -8,7 +8,7 @@
     /*
      * Image Service provides functionality for working with Sitefinity Images.
      */
-    librariesService.factory('sfImageService', ['$http', '$interpolate', function ($http, $interpolate) {
+    librariesService.factory('sfImageService', ['$http', '$interpolate', '$q', function ($http, $interpolate, $q) {
 
         var emptyGuid = '00000000-0000-0000-0000-000000000000',
             defaultAlbumId = '4ba7ad46-f29b-4e65-be17-9bf7ce5ba1fb', // TODO: hardcoded until I make album selector
@@ -57,6 +57,8 @@
 
             upload: function (file) {
 
+                var deferred = $q.defer();
+
                 var uploadFile = function (content) {
 
                     var formData = new FormData();
@@ -70,6 +72,21 @@
                     
                     var xhr = new XMLHttpRequest();
                     xhr.open('POST', uploadUrl);
+
+                    xhr.onload = function (e) {
+                        if (xhr.readyState === 4) {
+                            if (xhr.status === 200) {
+                                deferred.resolve(content);
+                            } else {
+                                deferred.reject(xhr.statusText);
+                            }
+                        }
+                    };
+
+                    xhr.onerror = function (e) {
+                        deferred.reject(xhr.statusText);
+                    };
+
                     xhr.send(formData);
                 };
 
@@ -80,6 +97,8 @@
                     .error(function () {
                         console.log('Image creation error!');
                     });
+
+                return deferred.promise;
             }
 
         };

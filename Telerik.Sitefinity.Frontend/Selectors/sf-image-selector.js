@@ -100,10 +100,18 @@
      */
     imageSelector.controller('sfImageSelectorInsertCtrl', ['$scope', '$interpolate', function ($scope, $interpolate) {
 
+        $scope.image = {};
+
+        $scope.$parent.$watch('image', function (newValue, oldValue) {
+            if (newValue) {
+                $scope.image = newValue.ContentItem;
+            }
+        });
+
         // subscribe to the event that inserts an image
         $scope.$on(modes[INSERT_MODE].okButton.raise, function (ev, args) {
 
-            var markup = '<img src="{{ ContentUrl }}" />';
+            var markup = '<img src="{{ MediaUrl }}" />';
             markup = $interpolate(markup)($scope.image);
             $scope.$emit('imageSelected', markup);
 

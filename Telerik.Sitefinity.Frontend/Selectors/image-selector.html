@@ -14,7 +14,13 @@
 
             <!-- LIST MODE -->
             <div ng-show="listFilter">
-                List mode...
+                <ul class="sf-image-selector-thumbails">
+                    <li ng-repeat="listItem in listItems">
+                        <a href="" ng-click="select(listItem)">
+                            <img height="71" ng-src="{{ listItem.ThumbnailUrl }}" />
+                        </a>
+                    </li>
+                </ul>
             </div>
 
         </div>

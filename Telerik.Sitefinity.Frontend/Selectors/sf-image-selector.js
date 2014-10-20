@@ -61,14 +61,38 @@
     /*
      * Provides functionality for the list mode of the image selector.
      */
-    imageSelector.controller('sfImageSelectorListCtrl', ['$scope', function ($scope) {
+    imageSelector.controller('sfImageSelectorListCtrl', ['$scope', 'sfImageService', function ($scope, sfImageService) {
 
         $scope.listFilter = null;
+
+        $scope.listItems = [];
+
+        $scope.select = function (image) {
+            $scope.$parent.image = image;
+        };
 
         // Event handler fired by the button for selecting a file manually.
         $scope.selectFile = function () {
             $scope.$emit('doSelectFile');
         };
+
+        var loadItems = function (filter) {
+            sfImageService.get().then(
+                function (result) {
+                    $scope.listItems = result.data.Items;
+                },
+                function (reason) {
+                    console.log('Error loading images.');
+                });
+        };
+
+        $scope.$watch('listFilter', function (newValue, oldValue) {
+            if (newValue) {
+                loadItems(newValue);
+            } else {
+                $scope.items = [];
+            }
+        });
 
     }]);
 
@@ -90,8 +114,8 @@
 
             sfImageService.upload($scope.file).then(
                 // success
-                function (contentItem) {
-                    $scope.$parent.image = contentItem;
+                function (data) {
+                    $scope.$parent.image = data.ContentItem;
                 },
                 // failure
                 function (error) {
@@ -126,7 +150,7 @@
 
         $scope.$parent.$watch('image', function (newValue, oldValue) {
             if (newValue) {
-                $scope.image = newValue.ContentItem;
+                $scope.image = newValue;
             }
         });
 

@@ -13,12 +13,13 @@
         var emptyGuid = '00000000-0000-0000-0000-000000000000',
             defaultAlbumId = '4ba7ad46-f29b-4e65-be17-9bf7ce5ba1fb', // TODO: hardcoded until I make album selector
             uploadUrl = '/Telerik.Sitefinity.Html5UploadHandler.ashx',
-            imageUrl = '/Sitefinity/Services/Content/ImageService.svc/parent/{{libraryId}}/{{itemId}}/?itemType={{itemType}}&provider={{provider}}&parentItemType={{parentItemType}}&newParentId={{newParentId}}',
+            imageUrl = '/Sitefinity/Services/Content/ImageService.svc/',
+            createImageUrl = imageUrl + 'parent/{{libraryId}}/{{itemId}}/?itemType={{itemType}}&provider={{provider}}&parentItemType={{parentItemType}}&newParentId={{newParentId}}',
             imageItemType = 'Telerik.Sitefinity.Libraries.Model.Image',
             albumItemType = 'Telerik.Sitefinity.Libraries.Model.Album';
 
         // generates the url for the image service for a specific image
-        var imageServiceUrl = function (file) {
+        var createImageServiceUrl = function (file) {
 
             var settings = {
                 libraryId: defaultAlbumId,
@@ -29,15 +30,25 @@
                 newParentId: defaultAlbumId
             };
 
-            return $interpolate(imageUrl)(settings);
+            return $interpolate(createImageUrl)(settings);
 
+        };
+
+        var getImagesServiceUrl = function (settings) {
+
+            var url = imageUrl;
+            url += '?itemType=' + imageItemType;
+            url += '&skip=0';
+            url += '&take=20';
+            url += '&filter=[ShowRecentLiveItems]'
+            return url;
         };
 
         // creates a new Sitefinity image content item
         var createImage = function (file) {
 
             var now = new Date(),
-                url = imageServiceUrl(file),
+                url = createImageServiceUrl(file),
                 image = {
                     Item: {
                         Title: {
@@ -109,7 +120,7 @@
             },
 
             get: function () {
-
+                return $http.get(getImagesServiceUrl())
             }
 
         };

@@ -36,10 +36,14 @@
 
         var getImagesServiceUrl = function (settings) {
 
+            var page = settings.page || 0,
+                pageSize = 24,
+                skip = pageSize * page;
+
             var url = imageUrl;
             url += '?itemType=' + imageItemType;
-            url += '&skip=0';
-            url += '&take=20';
+            url += '&skip=' + skip;
+            url += '&take=' + pageSize;
             url += '&filter=[ShowRecentLiveItems]'
             return url;
         };
@@ -119,8 +123,8 @@
                 return deferred.promise;
             },
 
-            get: function () {
-                return $http.get(getImagesServiceUrl())
+            get: function (options) {
+                return $http.get(getImagesServiceUrl(options))
             }
 
         };

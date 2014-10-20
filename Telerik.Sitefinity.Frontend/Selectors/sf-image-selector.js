@@ -1,6 +1,6 @@
 ﻿; (function () {
 
-    var imageSelector = angular.module('sfImageSelector', ['sfLibrariesService']);
+    var imageSelector = angular.module('sfImageSelector', ['sfLibrariesService', 'sfInfiniteScroll']);
 
     var selectors = angular.module('selectors');
 
@@ -63,9 +63,15 @@
      */
     imageSelector.controller('sfImageSelectorListCtrl', ['$scope', 'sfImageService', function ($scope, sfImageService) {
 
+        var currentPage = 0;
+
         $scope.listFilter = null;
 
         $scope.listItems = [];
+
+        $scope.loadMoreItems = function () {
+            loadItems();
+        };
 
         $scope.select = function (image) {
             $scope.$parent.image = image;
@@ -77,12 +83,17 @@
         };
 
         var loadItems = function (filter) {
-            sfImageService.get().then(
-                function (result) {
-                    $scope.listItems = result.data.Items;
-                },
-                function (reason) {
-                    console.log('Error loading images.');
+
+            sfImageService.get({ page: currentPage })
+                .then(
+                    // success
+                    function (result) {
+                        $scope.listItems = $scope.listItems.concat(result.data.Items);
+                        currentPage++;
+                    },
+                    // failure
+                    function (reason) {
+                        console.log('Error loading images.');
                 });
         };
 

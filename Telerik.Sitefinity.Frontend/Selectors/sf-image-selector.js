@@ -75,6 +75,8 @@
      */
     imageSelector.controller('sfImageSelectorUploadCtrl', ['$scope', 'sfImageService', function ($scope, sfImageService) {
 
+        $scope.completedPercent = 0;
+
         // represents the HTML File object to be uploaded
         $scope.file = null;
 
@@ -92,6 +94,10 @@
                 // failure
                 function (error) {
                     // TODO: handle the upload errors here
+                },
+                // notification
+                function (completion) {
+                    $scope.completedPercent = completion;
                 });
         });
 

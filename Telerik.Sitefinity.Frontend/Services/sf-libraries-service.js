@@ -71,7 +71,6 @@
                     formData.append('ImageFile', file);
                     
                     var xhr = new XMLHttpRequest();
-                    xhr.open('POST', uploadUrl);
 
                     xhr.onload = function (e) {
                         if (xhr.readyState === 4) {
@@ -83,10 +82,18 @@
                         }
                     };
 
+                    xhr.upload.onprogress = function (e) {
+                        var done = e.position || e.loaded,
+                            total = e.totalSize || e.total,
+                            present = Math.floor(done / total * 100);
+                        deferred.notify(present);
+                    };
+
                     xhr.onerror = function (e) {
                         deferred.reject(xhr.statusText);
                     };
 
+                    xhr.open('POST', uploadUrl);
                     xhr.send(formData);
                 };
 

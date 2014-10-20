@@ -159,6 +159,10 @@
 
         $scope.image = {};
 
+        $scope.insertOptions = {
+            alignment: 'none'
+        };
+
         $scope.$parent.$watch('image', function (newValue, oldValue) {
             if (newValue) {
                 $scope.image = newValue;

@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-md-8">
             
-            <!-- UPLOAD MODE -->
+            <!-- LIST UPLOAD MODE -->
             <div ng-hide="listFilter" class="text-center">
                 <button type="button" class="btn btn-link" ng-click="selectFile()">
                     Select image from your computer
@@ -12,7 +12,7 @@
                 <small>or simply drag &amp; drop it here</small>
             </div>
 
-            <!-- LIST MODE -->
+            <!-- LIST LIST MODE -->
             <div ng-show="listFilter" sf-infinite-scroll needs-data="loadMoreItems" style="height:300px;">
                 <ul class="sf-image-selector-thumbails">
                     <li ng-repeat="listItem in listItems">
@@ -73,6 +73,49 @@
 <div ng-controller="sfImageSelectorInsertCtrl" ng-show="activeMode.name === 'insert'">
     
     <img ng-src="{{ image.ThumbnailUrl }}" />
+
+    <label for="imageType">Type:</label>
+    <span id="imageType">{{ image.Extenstion }}</span>
+
+    <label for="imageSize">File size:</label>
+    <span id="imageSize">{{ image.TotalSize }}</span>
+
+    <label for="uploadDate">Uploaded:</label>
+    <span id="uploadDate">{{ image.DateCreated }}</span>
+
+    <form role="form">
+        
+        <div class="form-group">
+            <label for="imageTitle">Title</label>
+            <input id="imageTitle" type="text" ng-model="image.Title" />
+            <span class="help-block">Less than 35 characters are recommended</span>
+        </div>
+
+        <div class="form-group">
+            <label for="alternativeText">Alternative text</label>
+            <input id="alternativeText" type="text" ng-model="image.AlternativeText" />
+            <span class="help-block">Less than 35 characters are recommended</span>
+        </div>
+
+        <div class="form-group">
+            <label for="imageAlignment">Alignment</label>
+            
+            <label class="radio-inline">
+                <input type="radio" name="imageAlignment" ng-model="insertOptions.alignment" value="none"> None
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="imageAlignment" ng-model="insertOptions.alignment" value="left"> Left
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="imageAlignment" ng-model="insertOptions.alignment" value="center"> Center
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="imageAlignment" ng-model="insertOptions.alignment" value="right"> Right
+            </label>
+        </div>
+
+    </form>
+
 
 </div>
 

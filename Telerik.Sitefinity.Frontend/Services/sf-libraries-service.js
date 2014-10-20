@@ -106,6 +106,10 @@
                     });
 
                 return deferred.promise;
+            },
+
+            get: function () {
+
             }
 
         };

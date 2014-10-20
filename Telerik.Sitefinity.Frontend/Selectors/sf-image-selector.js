@@ -63,6 +63,8 @@
      */
     imageSelector.controller('sfImageSelectorListCtrl', ['$scope', function ($scope) {
 
+        $scope.listFilter = null;
+
         // Event handler fired by the button for selecting a file manually.
         $scope.selectFile = function () {
             $scope.$emit('doSelectFile');

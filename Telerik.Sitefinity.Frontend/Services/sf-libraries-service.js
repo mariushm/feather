@@ -44,7 +44,7 @@
             url += '?itemType=' + imageItemType;
             url += '&skip=' + skip;
             url += '&take=' + pageSize;
-            url += '&filter=[ShowRecentLiveItems]'
+            url += '&filter=[ShowRecentLiveItems]';
             return url;
         };
 
@@ -124,7 +124,7 @@
             },
 
             get: function (options) {
-                return $http.get(getImagesServiceUrl(options))
+                return $http.get(getImagesServiceUrl(options));
             }
 
         };

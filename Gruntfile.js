@@ -21,6 +21,7 @@ module.exports = function (grunt) {
 			unit:{
 				src: [
 				'Tests/Telerik.Sitefinity.Frontend.ClientTest/templates.js',
+				'Telerik.Sitefinity.Frontend/Core/*.js',
 				'Telerik.Sitefinity.Frontend/Designers/Scripts/*.js',
 				'Telerik.Sitefinity.Frontend/MVC/Scripts/Designer/*.js',
 				'Telerik.Sitefinity.Frontend/MVC/Scripts/*.js',

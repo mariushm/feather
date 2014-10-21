@@ -15,6 +15,7 @@ module.exports = function(config){
       '../../Telerik.Sitefinity.Frontend/Designers/Scripts/*.js',
 	  '../../Telerik.Sitefinity.Frontend/MVC/Scripts/Designer/*.js',
 	  '../../Telerik.Sitefinity.Frontend/MVC/Scripts/*.js',
+	  '../../Telerik.Sitefinity.Frontend/Core/*.js',
       '../../Telerik.Sitefinity.Frontend/Services/services.js',
 	  '../../Telerik.Sitefinity.Frontend/Services/news-item-service.js',
       '../../Telerik.Sitefinity.Frontend/Services/data-service.js',
@@ -60,7 +61,7 @@ module.exports = function(config){
 
     singleRun: true,
 
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', 'sinon'],
 
     browsers: ['PhantomJS'],
 
@@ -72,7 +73,8 @@ module.exports = function(config){
             'karma-phantomjs-launcher',
             'karma-jasmine',
             'karma-coverage',
-            'karma-ng-html2js-preprocessor'
+            'karma-ng-html2js-preprocessor',
+			'karma-sinon'
             ],
 			
     reporters: ['progress', 'junit', 'coverage'],

@@ -1,6 +1,6 @@
 ﻿; (function () {
 
-    var imageSelector = angular.module('sfImageSelector', ['sfLibrariesService', 'sfInfiniteScroll']);
+    var imageSelector = angular.module('sfImageSelector', ['sfLibrariesService', 'sfDates', 'sfInfiniteScroll']);
 
     var selectors = angular.module('selectors');
 

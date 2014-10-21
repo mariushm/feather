@@ -75,25 +75,25 @@
     <img ng-src="{{ image.ThumbnailUrl }}" />
 
     <label for="imageType">Type:</label>
-    <span id="imageType">{{ image.Extenstion }}</span>
+    <span id="imageType">{{ image.Extension }}</span>
 
     <label for="imageSize">File size:</label>
-    <span id="imageSize">{{ image.TotalSize }}</span>
+    <span id="imageSize">{{ image.TotalSize }} kb</span>
 
     <label for="uploadDate">Uploaded:</label>
-    <span id="uploadDate">{{ image.DateCreated }}</span>
+    <span id="uploadDate">{{ image.DateCreated | fromWcfDate | smartDateString }}</span>
 
     <form role="form">
         
         <div class="form-group">
             <label for="imageTitle">Title</label>
-            <input id="imageTitle" type="text" ng-model="image.Title" />
+            <input id="imageTitle" type="text" ng-model="image.Title" class="form-control" />
             <span class="help-block">Less than 35 characters are recommended</span>
         </div>
 
         <div class="form-group">
             <label for="alternativeText">Alternative text</label>
-            <input id="alternativeText" type="text" ng-model="image.AlternativeText" />
+            <input id="alternativeText" type="text" ng-model="image.AlternativeText" class="form-control" />
             <span class="help-block">Less than 35 characters are recommended</span>
         </div>
 

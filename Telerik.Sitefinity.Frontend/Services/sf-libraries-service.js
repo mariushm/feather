@@ -10,12 +10,16 @@
      */
     librariesService.factory('sfImageService', ['$http', '$interpolate', '$q', function ($http, $interpolate, $q) {
 
+        var imageServiceUrl = '/Sitefinity/Services/Content/ImageService.svc/',
+            itemTypeKey = 'itemType',
+            imageItemType = 'Telerik.Sitefinity.Libraries.Model.Image',
+            takeKey = 'take';
+
         var emptyGuid = '00000000-0000-0000-0000-000000000000',
             defaultAlbumId = '4ba7ad46-f29b-4e65-be17-9bf7ce5ba1fb', // TODO: hardcoded until I make album selector
             uploadUrl = '/Telerik.Sitefinity.Html5UploadHandler.ashx',
             imageUrl = '/Sitefinity/Services/Content/ImageService.svc/',
             createImageUrl = imageUrl + 'parent/{{libraryId}}/{{itemId}}/?itemType={{itemType}}&provider={{provider}}&parentItemType={{parentItemType}}&newParentId={{newParentId}}',
-            imageItemType = 'Telerik.Sitefinity.Libraries.Model.Image',
             albumItemType = 'Telerik.Sitefinity.Libraries.Model.Album';
 
         // generates the url for the image service for a specific image
@@ -123,8 +127,42 @@
                 return deferred.promise;
             },
 
+            /*
+             * Retrieves a single image or album.
+             * 
+             * options:
+             * id - If present, a single image will be returned. Represents the id of the image to be retrieved.
+             * provider - The name of the provider from which to retrieve the item.
+             * type - 'image' or 'album'; 'image' is default
+             */
             get: function (options) {
                 return $http.get(getImagesServiceUrl(options));
+            },
+
+            /*
+             * Retrieves a collection of images, albums or both.
+             * 
+             * options:
+             * skip - The number of items to skip before taking them in resulting dataset; default is 0
+             * take - The maximum number of items to take in resulting dataset; default is 20
+             * filter - The filter expression to apply when querying; default is null
+             * sort - The sort expression to apply when querying; default is null
+             * parentLibrary - The parent library within which to query; by default it is null, so it won't be taken into account
+             */
+            query: function (options) {
+
+                var settings = options || {},
+                    defaultTake = 20;
+
+
+                var getUrl = imageServiceUrl;
+                // specify item type
+                getUrl += '?' + itemTypeKey + '=' + imageItemType;
+                // specify take
+                getUrl += '&' + takeKey + '=' + (settings.take || defaultTake);
+
+                return $http.get(getUrl);
+
             }
 
         };

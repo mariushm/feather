@@ -45,6 +45,7 @@
     <Content Include="unit\Components\sf-infinite-scrollSpec.js" />
     <Content Include="unit\Core\sf-datesSpec.js" />
     <Content Include="unit\Services\serverContextSpec.js" />
+    <Content Include="unit\Services\sf-libraries-serviceSpec.js" />
     <EmbeddedResource Include="helpers\angular-kendo.js" />
     <Content Include="helpers\kendo.web.min.js" />
     <Content Include="unit\Mvc\Scripts\Designer\modalDialogSpec.js" />

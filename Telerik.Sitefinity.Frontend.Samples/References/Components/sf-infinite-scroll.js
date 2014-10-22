@@ -28,12 +28,17 @@
             // set overflow of the element to scroll
             $(element).css('overflow-y', 'scroll');
 
+            // make sure "needsData" delegate is present
+            if (!$scope.needsData) {
+                throw new Error('The value of sf-infinite-scroll attribute must be set. It is the function to be called when more data is needed.');
+            }
+
             element.off('scroll');
             element.on('scroll', function () {
                 // if element is at the bottom, call the delegated needsData function
                 if (atBottom(element)) {
                     $scope.$apply(function () {
-                        $scope.sfInfiniteScroll();
+                        $scope.needsData();
                     });
                 }
             });
@@ -42,7 +47,7 @@
         return {
             restrict: 'A',
             scope: {
-                sfInfiniteScroll: '&'
+                needsData: '&sfInfiniteScroll'
             },
             link: link
         };

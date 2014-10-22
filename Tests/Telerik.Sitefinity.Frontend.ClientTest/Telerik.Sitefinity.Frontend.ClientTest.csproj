@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="unit\Components\sf-infinite-scrollSpec.js" />
     <Content Include="unit\Core\sf-datesSpec.js" />
     <Content Include="unit\Services\serverContextSpec.js" />
     <EmbeddedResource Include="helpers\angular-kendo.js" />

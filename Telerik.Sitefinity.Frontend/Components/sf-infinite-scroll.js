@@ -33,7 +33,7 @@
                 // if element is at the bottom, call the delegated needsData function
                 if (atBottom(element)) {
                     $scope.$apply(function () {
-                        $scope.sfInfiniteScroll();
+                        $scope.needsData();
                     });
                 }
             });
@@ -42,7 +42,7 @@
         return {
             restrict: 'A',
             scope: {
-                sfInfiniteScroll: '&'
+                needsData: '&sfInfiniteScroll'
             },
             link: link
         };

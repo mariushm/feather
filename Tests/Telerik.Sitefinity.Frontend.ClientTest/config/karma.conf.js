@@ -16,6 +16,7 @@ module.exports = function(config){
 	  '../../Telerik.Sitefinity.Frontend/MVC/Scripts/Designer/*.js',
 	  '../../Telerik.Sitefinity.Frontend/MVC/Scripts/*.js',
 	  '../../Telerik.Sitefinity.Frontend/Core/*.js',
+	  '../../Telerik.Sitefinity.Frontend/Components/*.js',
       '../../Telerik.Sitefinity.Frontend/Services/services.js',
 	  '../../Telerik.Sitefinity.Frontend/Services/news-item-service.js',
       '../../Telerik.Sitefinity.Frontend/Services/data-service.js',

@@ -71,22 +71,13 @@
                 oneHourInMs = oneMinuteInMs * 60,
                 oneDayInMs = oneHourInMs * 24;
 
-            if (differenceInMs < oneMinuteInMs) {
-                return 'A few seconds ago';
-            } else if (differenceInMs < oneHourInMs) {
-                return '5 minutes ago';
-            } else if (differenceInMs < oneDayInMs) {
-                return '8 hours ago';
-            } else if (differenceInMs < (oneDayInMs * 2)) {
-                return 'Yesterday';
-            } else {
-                if (now.getYear() === input.getYear()) {
-                    return $filter('date')(input, 'd MMMM');
-                } else {
-                    return $filter('date')(input, 'd MMMM yyyy');
-                }
-                
-            }
+            if (differenceInMs < oneMinuteInMs) return 'A few seconds ago';
+            if (differenceInMs < oneHourInMs) return '5 minutes ago';
+            if (differenceInMs < oneDayInMs) return '8 hours ago';
+            if (differenceInMs < (oneDayInMs * 2)) return 'Yesterday';
+            if (now.getYear() === input.getYear()) return $filter('date')(input, 'd MMMM');
+
+            return $filter('date')(input, 'd MMMM yyyy');
             
         };
     }]);

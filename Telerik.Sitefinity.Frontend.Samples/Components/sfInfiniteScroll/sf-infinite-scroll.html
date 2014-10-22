@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="sfSample">
+<head>
+    <title>sfInfiniteScroll</title>
+
+    <script type="text/javascript" src="../../References/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="../../References/Angular/angular.min.js"></script>
+    <script type="text/javascript" src="../../References/Components/sf-infinite-scroll.js"></script>
+
+</head>
+
+<body ng-controller="sampleCtrl">
+
+    <div style="height:200px;" sf-infinite-scroll="loadData()">
+        <ul>
+            <li ng-repeat="item in items">{{item}}</li>
+        </ul>
+    </div>
+
+    <script type="text/javascript">
+
+    angular.module('sfSample', ['sfInfiniteScroll'])
+        .controller('sampleCtrl', function ($scope) {
+
+            // data items that will be bound
+            $scope.items = [];
+
+            // function which loads data. In this case we are just generating
+            // sequentially 20 more numbers. In a real world scenario, this function
+            // would probably call a service and load data asynchronously.
+            $scope.loadData = function () {
+                var count = $scope.items.length;
+                for (var i = count; i < count + 20; i++) {
+                    $scope.items.push(i);
+                }
+            };
+
+            // load the initial data items
+            $scope.loadData(true);
+
+        });
+
+    </script>
+
+
+</body>
+
+</html>

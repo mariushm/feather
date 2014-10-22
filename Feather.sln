@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio Express 2013 for Web
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.Sitefinity.Frontend", "Telerik.Sitefinity.Frontend\Telerik.Sitefinity.Frontend.csproj", "{17ED04C3-0AB9-4055-9908-6C70720DAF77}"
 EndProject
@@ -48,6 +48,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.Sitefinity.Frontend
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.Sitefinity.Frontend.TestUnit", "Tests\Telerik.Sitefinity.Frontend.TestUnit\Telerik.Sitefinity.Frontend.TestUnit.csproj", "{D607959E-5DE3-43B9-8731-C22E495FCEF7}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Telerik.Sitefinity.Frontend.Samples", "Telerik.Sitefinity.Frontend.Samples\Telerik.Sitefinity.Frontend.Samples.vbproj", "{95898074-B30E-4E45-8A2E-1308E28B7F2A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,10 @@ Global
 		{D607959E-5DE3-43B9-8731-C22E495FCEF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D607959E-5DE3-43B9-8731-C22E495FCEF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D607959E-5DE3-43B9-8731-C22E495FCEF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95898074-B30E-4E45-8A2E-1308E28B7F2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95898074-B30E-4E45-8A2E-1308E28B7F2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95898074-B30E-4E45-8A2E-1308E28B7F2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95898074-B30E-4E45-8A2E-1308E28B7F2A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

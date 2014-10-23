@@ -13,7 +13,7 @@
             </div>
 
             <!-- LIST LIST MODE -->
-            <div ng-show="listFilter" sf-infinite-scroll="loadMoreItems()" style="height:300px;">
+            <div ng-show="listFilter" sf-infinite-scroll="loadItems()" style="height:300px;">
                 <ul class="sf-image-selector-thumbails">
                     <li ng-repeat="listItem in listItems">
                         <a href="" ng-click="select(listItem)">

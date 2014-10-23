@@ -1,6 +1,8 @@
 ﻿describe('sfImageSelector', function () {
 
     var $httpBackend,
+        $rootScope,
+        $compile,
         imageService;
 
     beforeEach(module('sfLibrariesService'));
@@ -8,6 +10,7 @@
 
     beforeEach(inject(function ($injector) {
         $httpBackend = $injector.get('$httpBackend');
+        $compile = $injector.get('$compile');
         imageService = $injector.get('sfImageService');
     }));
 
@@ -16,14 +19,15 @@
         $httpBackend.verifyNoOutstandingRequest();
     });
 
-    describe('sfImageSelectorListCtrl', function () {
+    describe('Controller: sfImageSelectorListCtrl', function () {
 
         var scope,
             service,
             createController;
 
-        beforeEach(inject(function ($rootScope, $controller) {
+        beforeEach(inject(function ($injector, $controller) {
 
+            $rootScope = $injector.get('$rootScope');
             scope = $rootScope.$new();
 
             createController = function () {
@@ -81,6 +85,55 @@
 
         });
         
+        it('raises CloseDialog event when CancelSelect command is fired', function () {
+
+            var ctrl = createController();
+
+            // we'll spy on the emit function to make sure
+            // closeDialog is emitted
+            spyOn(scope, "$emit");
+
+
+            // fire the 'CancelSelect' command from the scope up the
+            // hierarchy
+            $rootScope.$broadcast('CancelSelect');
+
+            expect(scope.$emit).toHaveBeenCalledWith('Cancel');
+        });
+
+    });
+
+    describe('Directive: sfImageSelectorModal', function () {
+
+        var scope;
+
+        beforeEach(inject(function ($injector) {
+            
+            scope = $injector.get('$rootScope');
+
+        }));
+
+        it('should call scope.$modalInstance.close() when any of the child scopes emits "Cancel" command', function () {
+
+            var element = angular.element('<sf-image-selector-modal></sf-image-selector-modal>'),
+                wasCalled = false;
+
+            scope.$modalInstance = {
+                close: function (arg) {
+                    wasCalled = true;
+                }
+            };
+
+            var childScope = scope.$new();
+
+            var directive = $compile(element)(scope);
+            scope.$digest();
+
+            // emit "Cancel" command from child scope
+            childScope.$emit('Cancel');
+            
+            expect(wasCalled).toBe(true);
+        });
 
     });
 

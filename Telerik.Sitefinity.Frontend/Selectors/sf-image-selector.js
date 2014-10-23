@@ -63,34 +63,13 @@
      */
     imageSelector.controller('sfImageSelectorListCtrl', ['$scope', 'sfImageService', function ($scope, sfImageService) {
 
-        var currentPage = 0;
-
         /*
-         * The predefined filters present in the user interface. Can have following
-         * values
-         * null - No filtering, controller should be in upload mode
-         * 'recent' - List should display recent items (both images and albums)
-         * 'mine' - List should display my items (both images and albums)
-         * 'all' - List should display all items (both images and albums)
+         * Loads items through the sfImageService. For paging, take is default
+         * one as defined in the sfImageService.query function; skip is calculated
+         * by the current number of listItems present in the $scope.listItems property
+         * as we are doing infinite scrolling.
          */
-        $scope.listFilter = null;
-
-        $scope.listItems = [];
-
-        $scope.loadMoreItems = function () {
-            loadItems();
-        };
-
-        $scope.select = function (image) {
-            $scope.$parent.image = image;
-        };
-
-        // Event handler fired by the button for selecting a file manually.
-        $scope.selectFile = function () {
-            $scope.$emit('doSelectFile');
-        };
-
-        var loadItems = function () {
+        $scope.loadItems = function () {
 
             var queryOptions = {
                 skip: $scope.listItems.length
@@ -107,20 +86,30 @@
 
                     }
                 );
+        };
 
-            /*
-            sfImageService.get({ page: currentPage })
-                .then(
-                    // success
-                    function (result) {
-                        $scope.listItems = $scope.listItems.concat(result.data.Items);
-                        currentPage++;
-                    },
-                    // failure
-                    function (reason) {
-                        console.log('Error loading images.');
-                });
-            */
+        /*
+         * The predefined filters present in the user interface. Can have following
+         * values
+         * null - No filtering, controller should be in upload mode
+         * 'recent' - List should display recent items (both images and albums)
+         * 'mine' - List should display my items (both images and albums)
+         * 'all' - List should display all items (both images and albums)
+         */
+        $scope.listFilter = null;
+
+        /*
+         * The array of all list items that are to be displayed in the list.
+         */
+        $scope.listItems = [];
+
+        $scope.select = function (image) {
+            $scope.$parent.image = image;
+        };
+
+        // Event handler fired by the button for selecting a file manually.
+        $scope.selectFile = function () {
+            $scope.$emit('doSelectFile');
         };
 
         /*
@@ -128,11 +117,22 @@
          */
         $scope.$watch('listFilter', function (newValue, oldValue) {
             if (newValue) {
-                loadItems();
+                $scope.loadItems();
             } else {
                 $scope.items = [];
             }
         });
+
+        /*
+         * Subscribe to the cancel command of the list mode so that we can handle
+         * it.
+         */
+        $scope.$on(modes[LIST_MODE].cancelButton.raise, function () {
+            // When cancel command for list mode is closed, we need
+            // to rise the Cancel event so that it can be handled 
+            // above the chain
+            $scope.$emit('Cancel');
+        })
 
     }]);
 
@@ -311,6 +311,15 @@
                     $(element).trigger('imageSelected', e);
                 });
                 $scope.$modalInstance.close(args);
+            });
+
+            /*
+             * Subscribes to the "Cancel" command which could be fired by any
+             * of the child scopes down the hierarchy. Once this command is fired
+             * the directive will close the itself [the modal].
+             */
+            $scope.$on('Cancel', function (ev, args) {
+                $scope.$modalInstance.close();
             });
 
             /*

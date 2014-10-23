@@ -13,6 +13,7 @@
         var imageServiceUrl = '/Sitefinity/Services/Content/ImageService.svc/',
             itemTypeKey = 'itemType',
             imageItemType = 'Telerik.Sitefinity.Libraries.Model.Image',
+            skipKey = 'skip',
             takeKey = 'take';
 
         var emptyGuid = '00000000-0000-0000-0000-000000000000',
@@ -158,6 +159,10 @@
                 var getUrl = imageServiceUrl;
                 // specify item type
                 getUrl += '?' + itemTypeKey + '=' + imageItemType;
+                // specify skip
+                if (settings.skip) {
+                    getUrl += '&' + skipKey + '=' + settings.skip;
+                }
                 // specify take
                 getUrl += '&' + takeKey + '=' + (settings.take || defaultTake);
 

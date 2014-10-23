@@ -92,11 +92,15 @@
 
         var loadItems = function () {
 
-            sfImageService.query()
+            var queryOptions = {
+                skip: $scope.listItems.length
+            };
+
+            sfImageService.query(queryOptions)
                 .then(
                     // success
                     function (result) {
-                        $scope.listItems = result.data.Items;
+                        $scope.listItems = $scope.listItems.concat(result.data.Items);
                     },
                     // failure
                     function (reason) {

@@ -23,7 +23,7 @@
 
         describe('#query', function () {
 
-            it('options object is null, makes a request with default options', function () {
+            it('makes a request with default options when options object is null', function () {
 
                 var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20';
                 $httpBackend.expectGET(serviceUrl).respond([]);
@@ -32,6 +32,22 @@
                 service.query();
                 
                 $httpBackend.flush();
+            });
+
+            it('makes a request with default options, but takes into account skip parameter when present', function () {
+
+                var queryOptions = {
+                        skip: 28
+                    },
+                    serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&skip=28&take=20';
+
+                $httpBackend.expectGET(serviceUrl).respond([]);
+
+                // call the query method with no options
+                service.query(queryOptions);
+
+                $httpBackend.flush();
+
             });
 
         });

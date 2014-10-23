@@ -24,6 +24,7 @@
         describe('#query', function () {
 
             it('options object is null, makes a request with default options', function () {
+
                 var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20';
                 $httpBackend.expectGET(serviceUrl).respond([]);
 

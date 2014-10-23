@@ -423,7 +423,6 @@
     <EmbeddedResource Include="Mvc\Scripts\Templates\style-dropdown.html" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Mvc\Scripts\ng-infinite-scroll.min.js" />
     <EmbeddedResource Include="Services\sf-libraries-service.js" />
     <EmbeddedResource Include="Selectors\image-selector-modal.html" />
     <EmbeddedResource Include="Selectors\image-selector.html" />

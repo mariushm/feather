@@ -36,9 +36,11 @@
 
         it('it loads 20 albums and images from service into the listItems array', function () {
 
-            var fakeData = [];
+            var fakeData = {
+                Items: []
+            };
             for (var i = 0; i < 20; i++) {
-                fakeData.push(i);
+                fakeData.Items.push(i);
             }
 
             var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20';

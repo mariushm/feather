@@ -96,7 +96,7 @@
                 .then(
                     // success
                     function (result) {
-                        $scope.listItems = result.data;
+                        $scope.listItems = result.data.Items;
                     },
                     // failure
                     function (reason) {

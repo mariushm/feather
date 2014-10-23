@@ -43,7 +43,41 @@
 
                 $httpBackend.expectGET(serviceUrl).respond([]);
 
-                // call the query method with no options
+                // call the query method with options
+                service.query(queryOptions);
+
+                $httpBackend.flush();
+
+            });
+
+            it('makes a request with a string filter, no other settings', function () {
+
+                var queryOptions = {
+                    filter: 'Title = "Hello world"'
+                },
+                serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live) AND (Title = "Hello world")';
+
+                $httpBackend.expectGET(serviceUrl).respond([]);
+
+                // call the query method with options
+                service.query(queryOptions);
+
+                $httpBackend.flush();
+
+            });
+
+            it('makes a request with a named filter, no other settings', function () {
+
+                var queryOptions = {
+                    filter: {
+                        name: 'recent'
+                    }
+                },
+                serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=[ShowRecentLiveItems]';
+
+                $httpBackend.expectGET(serviceUrl).respond([]);
+
+                // call the query method with options
                 service.query(queryOptions);
 
                 $httpBackend.flush();

@@ -68,53 +68,6 @@
             };
         }));
 
-        it('loads 20 albums and images from service into the listItems array', function () {
-
-            var fakeData = {
-                Items: []
-            };
-            for (var i = 0; i < 20; i++) {
-                fakeData.Items.push(i);
-            }
-
-            var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)';
-            $httpBackend.expectGET(serviceUrl).respond(fakeData);
-
-            var ctrl = createController();
-            scope.listFilter = 'all';
-
-            $httpBackend.flush();
-
-            expect(scope.listItems.length).toEqual(20);
-        });
-
-        it('loads 20 albums and images from service into the listItems array, but skips the items already loaded - infinite scroll', function () {
-
-            var fakeData = {
-                Items: []
-            };
-            for (var i = 0; i < 20; i++) {
-                fakeData.Items.push(i);
-            }
-
-            var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&skip=20&take=20&filter=(Visible=true AND Status=Live)';
-            $httpBackend.expectGET(serviceUrl).respond(fakeData);
-
-            var ctrl = createController();
-            scope.listItems = [];
-            // preload 20 items in the scope to test paging with skip
-            for (var i = 0; i < 20; i++) {
-                scope.listItems.push(i);
-            }
-
-            scope.listFilter = 'all';
-
-            $httpBackend.flush();
-
-            expect(scope.listItems.length).toEqual(40);
-
-        });
-        
         it('raises ImageSelected event when DoneSelecting command is fired', function () {
 
             var ctrl = createController();
@@ -159,6 +112,70 @@
             scope.select(item);
 
             expect(scope.selectedItem).toBe(item);
+
+        });
+
+        var filterTest = function (filter, loadedItemsCount, expectedUrl) {
+
+            var fakeData = {
+                Items: []
+            };
+            for (var i = 0; i < 20; i++) {
+                fakeData.Items.push(i);
+            }
+            
+            $httpBackend.expectGET(expectedUrl).respond(fakeData);
+
+            var ctrl = createController();
+
+            scope.listItems = [];
+            // preload items in the scope to test paging with skip
+            for (var i = 0; i < loadedItemsCount; i++) {
+                scope.listItems.push(i);
+            }
+
+            scope.listFilter = filter;
+
+            $httpBackend.flush();
+
+            expect(scope.listItems.length).toEqual(20 + loadedItemsCount);
+
+        };
+
+        describe('#filter = "all"', function () {
+
+            it('loads 20 albums and images from service into the listItems array', function () {
+                
+                var filter = 'all',
+                    preloadedItems = 0,
+                    expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)';
+
+                filterTest(filter, preloadedItems, expectedUrl);
+
+            });
+
+            it('loads 20 albums and images from service into the listItems array, but skips the items already loaded - infinite scroll', function () {
+
+                var filter = 'all',
+                    preloadedItems = 20,
+                    expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&skip=20&take=20&filter=(Visible=true AND Status=Live)';
+
+                filterTest(filter, preloadedItems, expectedUrl);
+
+            });
+        });
+
+        describe('#filter = "recent"', function () {
+
+            it('loads 20 albums and images from service into the listItems array', function () {
+
+                var filter = 'recent',
+                    preloadedItems = 0,
+                    expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=[ShowRecentLiveItems]';
+
+                filterTest(filter, preloadedItems, expectedUrl);
+
+            });
 
         });
 

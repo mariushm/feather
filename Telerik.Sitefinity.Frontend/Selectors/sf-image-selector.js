@@ -74,6 +74,13 @@
             var queryOptions = {
                 skip: $scope.listItems.length
             };
+            switch ($scope.listFilter) {
+                case 'recent':
+                    queryOptions.filter = {
+                        name: 'recent'
+                    };
+                    break;
+            }
 
             sfImageService.query(queryOptions)
                 .then(
@@ -153,7 +160,7 @@
             // to rise the Cancel event so that it can be handled 
             // up the chain
             $scope.$emit('Cancel');
-        })
+        });
 
     }]);
 

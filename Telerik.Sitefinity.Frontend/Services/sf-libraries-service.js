@@ -167,8 +167,20 @@
                 getUrl += '&' + takeKey + '=' + (settings.take || defaultTake);
 
                 // specify the filter
-                var onlyPublic = '(Visible=true AND Status=Live)';
-                getUrl += '&filter=' + onlyPublic;
+                if (settings.filter) {
+                    if (typeof settings.filter === 'string') {
+                        getUrl += '&filter=(Visible=true AND Status=Live)';
+                        getUrl += " AND (" + settings.filter + ')';
+                    } else {
+                        switch (settings.filter.name) {
+                            case 'recent':
+                                getUrl += '&filter=[ShowRecentLiveItems]';
+                                break;
+                        }
+                    }
+                } else {
+                    getUrl += '&filter=(Visible=true AND Status=Live)';
+                }
 
                 return $http.get(getUrl);
 

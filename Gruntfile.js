@@ -25,15 +25,15 @@ module.exports = function (grunt) {
 				'Telerik.Sitefinity.Frontend/Designers/Scripts/*.js',
 				'Telerik.Sitefinity.Frontend/MVC/Scripts/Designer/*.js',
 				'Telerik.Sitefinity.Frontend/MVC/Scripts/*.js',
+				'Telerik.Sitefinity.Frontend/Components/*.js',
 				'Telerik.Sitefinity.Frontend/Services/services.js',
-				'Telerik.Sitefinity.Frontend/Services/news-item-service.js',
-				'Telerik.Sitefinity.Frontend/Services/data-service.js',
-				'Telerik.Sitefinity.Frontend/Services/flat-taxon-service.js',
+				'Telerik.Sitefinity.Frontend/Services/*.js',
 				'Telerik.Sitefinity.Frontend/Selectors/selectors.js',
 				'Telerik.Sitefinity.Frontend/Selectors/list-selector.js',
 				'Telerik.Sitefinity.Frontend/Selectors/news-selector.js',
 				'Telerik.Sitefinity.Frontend/Selectors/dynamic-items-selector.js',
 				'Telerik.Sitefinity.Frontend/Selectors/taxon-selector.js',
+				'Telerik.Sitefinity.Frontend/Selectors/sf-image-selector.js',
 				'!Telerik.Sitefinity.Frontend/Designers/Scripts/page-editor.js',
 				'Tests/Telerik.Sitefinity.Frontend.ClientTest/helpers/mocks/*.js'],
 				options: {
@@ -45,6 +45,7 @@ module.exports = function (grunt) {
 					'Tests/Telerik.Sitefinity.Frontend.ClientTest/helpers/angular-mocks.js',
 					'Tests/Telerik.Sitefinity.Frontend.ClientTest/helpers/kendo.web.min.js',
 					'Tests/Telerik.Sitefinity.Frontend.ClientTest/helpers/angular-kendo.js',
+					'node_modules/sinon/lib/**/*.js',
 					'Telerik.Sitefinity.Frontend/MVC/Scripts/Bootstrap/js/*.js',
 					'!Telerik.Sitefinity.Frontend/Mvc/Scripts/Angular/**'
 					],
@@ -86,5 +87,6 @@ module.exports = function (grunt) {
 	
 	//Default task(s)
 	grunt.registerTask('default', ['jshint','html2js', 'jasmine']);
+	grunt.registerTask('hint', ['jshint']);
 	
 };

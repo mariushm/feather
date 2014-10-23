@@ -26,6 +26,7 @@ module.exports = function(config){
       '../../Telerik.Sitefinity.Frontend/Selectors/dynamic-items-selector.html',
       '../../Telerik.Sitefinity.Frontend/Selectors/news-selector.js',
       '../../Telerik.Sitefinity.Frontend/Selectors/news-selector.html',
+	  '../../Telerik.Sitefinity.Frontend/Selectors/sf-image-selector.js',
       'helpers/mocks/*.js',
       'unit/**'
     ],

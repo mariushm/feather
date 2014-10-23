@@ -65,6 +65,14 @@
 
         var currentPage = 0;
 
+        /*
+         * The predefined filters present in the user interface. Can have following
+         * values
+         * null - No filtering, controller should be in upload mode
+         * 'recent' - List should display recent items (both images and albums)
+         * 'mine' - List should display my items (both images and albums)
+         * 'all' - List should display all items (both images and albums)
+         */
         $scope.listFilter = null;
 
         $scope.listItems = [];
@@ -82,8 +90,21 @@
             $scope.$emit('doSelectFile');
         };
 
-        var loadItems = function (filter) {
+        var loadItems = function () {
 
+            sfImageService.query()
+                .then(
+                    // success
+                    function (result) {
+                        $scope.listItems = result.data;
+                    },
+                    // failure
+                    function (reason) {
+
+                    }
+                );
+
+            /*
             sfImageService.get({ page: currentPage })
                 .then(
                     // success
@@ -95,11 +116,15 @@
                     function (reason) {
                         console.log('Error loading images.');
                 });
+            */
         };
 
+        /*
+         * Watches the listFilter property. If the list property is set to 
+         */
         $scope.$watch('listFilter', function (newValue, oldValue) {
             if (newValue) {
-                loadItems(newValue);
+                loadItems();
             } else {
                 $scope.items = [];
             }

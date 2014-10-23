@@ -7559,6 +7559,9 @@ ul.sf-image-selector-thumbails {
       text-align: center;
       width: 70px; }
     /* line 57, C:/feather/feather/Telerik.Sitefinity.Frontend/assets/src/sass/sitefinity-backend.sass */
+    ul.sf-image-selector-thumbails li a.selected {
+      border: 1px solid red; }
+    /* line 60, C:/feather/feather/Telerik.Sitefinity.Frontend/assets/src/sass/sitefinity-backend.sass */
     ul.sf-image-selector-thumbails li a:hover {
       color: #105cb6;
       cursor: pointer;

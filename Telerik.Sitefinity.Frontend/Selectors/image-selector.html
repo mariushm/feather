@@ -16,7 +16,7 @@
             <div ng-show="listFilter" sf-infinite-scroll="loadItems()" style="height:300px;">
                 <ul class="sf-image-selector-thumbails">
                     <li ng-repeat="listItem in listItems">
-                        <a href="" ng-click="select(listItem)">
+                        <a href="" ng-click="select(listItem)" ng-class="(selectedItem.Id === listItem.Id) ? 'selected' : ''">
                             <img height="71" ng-src="{{ listItem.ThumbnailUrl }}" />
                         </a>
                     </li>

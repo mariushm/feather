@@ -103,8 +103,17 @@
          */
         $scope.listItems = [];
 
-        $scope.select = function (image) {
-            $scope.$parent.image = image;
+
+        /*
+         * Represents the item that is currently selected in the list.
+         */
+        $scope.selectedItem = null;
+
+        /*
+         * Event handler which handles the event of a user selecting an item.
+         */
+        $scope.select = function (item) {
+            $scope.selectedItem = item;
         };
 
         // Event handler fired by the button for selecting a file manually.
@@ -124,13 +133,25 @@
         });
 
         /*
+         * Subscribe to the ok command of the list mode so that we can handle
+         * it.
+         */
+        $scope.$on(modes[LIST_MODE].okButton.raise, function () {
+            // When ok command for the list mode is fired, we need
+            // to rise the ImageSelected event so that it can be 
+            // handled up the chain. Also send the selected item
+            // as an event argument.
+            $scope.$emit('ImageSelected', $scope.selectedItem);
+        });
+
+        /*
          * Subscribe to the cancel command of the list mode so that we can handle
          * it.
          */
         $scope.$on(modes[LIST_MODE].cancelButton.raise, function () {
-            // When cancel command for list mode is closed, we need
+            // When cancel command for list mode is fired, we need
             // to rise the Cancel event so that it can be handled 
-            // above the chain
+            // up the chain
             $scope.$emit('Cancel');
         })
 
@@ -248,29 +269,39 @@
             });
 
             /*
+             * Subscribe to the ImageSelected event which could be fired by any
+             * of the child scopes. Set the $scope.image property to the argument
+             * that was sent [newly selected image] and switch the active mode to
+             * insert.
+             */
+            $scope.$on('ImageSelected', function (ev, arg) {
+                $scope.image = arg;
+                $scope.activeMode = modes[INSERT_MODE];
+            });
+
+            /*
              * If the image field has been changed to something else
              * than null, it means user has selected an image and we should
              * switch the mode of the ImageSelector to insert mode.
              */
-            $scope.$watch('image', function (newValue, oldValue) {
-                if (newValue) {
-                    $scope.activeMode = modes[INSERT_MODE];
-                }
-            });
+            //$scope.$watch('image', function (newValue, oldValue) {
+            //    if (newValue) {
+            //        $scope.activeMode = modes[INSERT_MODE];
+            //    }
+            //});
 
             /*
              * Watches the active mode in order to be able to emit an event
              * when mode has changed.
              */
-            $scope.$watch('activeMode', function (newValue, oldValue) {
-                $scope.$emit('modeChanged', newValue);
-            });
+            //$scope.$watch('activeMode', function (newValue, oldValue) {
+            //    $scope.$emit('modeChanged', newValue);
+            //});
 
         };
 
         return {
             restrict: 'E',
-            scope: {},
             templateUrl: serverContext.getEmbeddedResourceUrl('Telerik.Sitefinity.Frontend', 'Selectors/image-selector.html'),
             controller: imageSelectorController
         };
@@ -306,12 +337,12 @@
                 $scope.mode = newMode;
             });
 
-            $scope.$on('imageSelected', function (ev, args) {
-                $scope.$modalInstance.result.then(function (e) {
-                    $(element).trigger('imageSelected', e);
-                });
-                $scope.$modalInstance.close(args);
-            });
+            //$scope.$on('imageSelected', function (ev, args) {
+            //    $scope.$modalInstance.result.then(function (e) {
+            //        $(element).trigger('imageSelected', e);
+            //    });
+            //    $scope.$modalInstance.close(args);
+            //});
 
             /*
              * Subscribes to the "Cancel" command which could be fired by any

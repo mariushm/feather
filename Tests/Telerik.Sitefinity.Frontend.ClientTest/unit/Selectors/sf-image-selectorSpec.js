@@ -1,7 +1,6 @@
 ﻿describe('sfImageSelector', function () {
 
     var $httpBackend,
-        $rootScope,
         $compile,
         imageService;
 
@@ -19,9 +18,40 @@
         $httpBackend.verifyNoOutstandingRequest();
     });
 
+    describe('Directive: sfImageSelector', function () {
+
+        var scope;
+
+        beforeEach(inject(function ($rootScope) {
+            scope = $rootScope.$new();
+        }));
+
+        it('should subscribe to "ImageSelected" event, set the $scope.image to selected image and switch to insert mode', function () {
+
+            $httpBackend.expectGET('/Frontend-Assembly/Telerik.Sitefinity.Frontend/Selectors/image-selector.html')
+                        .respond('<div></div>');
+
+            var element = angular.element('<sf-image-selector></sf-image-selector>'),
+                selectedItem = { Title: 'Item 1' },
+                childScope = scope.$new(),
+                directive = $compile(element)(scope);
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            // emit the "ImageSelected" command from child scope
+            childScope.$emit('ImageSelected', selectedItem);
+
+            expect(scope.image.Title).toEqual(selectedItem.Title);
+            expect(scope.activeMode.name).toEqual('insert');
+        });
+
+    });
+
     describe('Controller: sfImageSelectorListCtrl', function () {
 
-        var scope,
+        var $rootScope,
+            scope,
             service,
             createController;
 
@@ -85,13 +115,33 @@
 
         });
         
+        it('raises ImageSelected event when DoneSelecting command is fired', function () {
+
+            var ctrl = createController();
+
+            scope.selectedItem = {
+                Title: 'Item 1'
+            };
+
+            // we'll spy on the emit function to make sure
+            // ImageSelected event is emitted
+            spyOn(scope, '$emit');
+
+            // fire the 'DoneSelecting' command from the scope up
+            // the hierarchy
+            $rootScope.$broadcast('DoneSelecting');
+
+            expect(scope.$emit).toHaveBeenCalledWith('ImageSelected', scope.selectedItem);
+
+        });
+
         it('raises CloseDialog event when CancelSelect command is fired', function () {
 
             var ctrl = createController();
 
             // we'll spy on the emit function to make sure
-            // closeDialog is emitted
-            spyOn(scope, "$emit");
+            // Cancel event is emitted
+            spyOn(scope, '$emit');
 
 
             // fire the 'CancelSelect' command from the scope up the
@@ -99,6 +149,17 @@
             $rootScope.$broadcast('CancelSelect');
 
             expect(scope.$emit).toHaveBeenCalledWith('Cancel');
+        });
+
+        it('sets the $scope.selectedItem property when select function is called', function () {
+
+            var ctrl = createController(),
+                item = { Title: 'One' };
+
+            scope.select(item);
+
+            expect(scope.selectedItem).toBe(item);
+
         });
 
     });

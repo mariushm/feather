@@ -25,7 +25,7 @@
 
             it('makes a request with default options when options object is null', function () {
 
-                var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20';
+                var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)';
                 $httpBackend.expectGET(serviceUrl).respond([]);
 
                 // call the query method with no options
@@ -39,7 +39,7 @@
                 var queryOptions = {
                         skip: 28
                     },
-                    serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&skip=28&take=20';
+                    serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&skip=28&take=20&filter=(Visible=true AND Status=Live)';
 
                 $httpBackend.expectGET(serviceUrl).respond([]);
 

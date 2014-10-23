@@ -166,6 +166,10 @@
                 // specify take
                 getUrl += '&' + takeKey + '=' + (settings.take || defaultTake);
 
+                // specify the filter
+                var onlyPublic = '(Visible=true AND Status=Live)';
+                getUrl += '&filter=' + onlyPublic;
+
                 return $http.get(getUrl);
 
             }

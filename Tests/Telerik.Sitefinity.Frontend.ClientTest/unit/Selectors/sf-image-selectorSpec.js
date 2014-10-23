@@ -77,7 +77,7 @@
                 fakeData.Items.push(i);
             }
 
-            var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20';
+            var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)';
             $httpBackend.expectGET(serviceUrl).respond(fakeData);
 
             var ctrl = createController();
@@ -97,7 +97,7 @@
                 fakeData.Items.push(i);
             }
 
-            var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&skip=20&take=20';
+            var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&skip=20&take=20&filter=(Visible=true AND Status=Live)';
             $httpBackend.expectGET(serviceUrl).respond(fakeData);
 
             var ctrl = createController();

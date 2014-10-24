@@ -14,7 +14,9 @@
             itemTypeKey = 'itemType',
             imageItemType = 'Telerik.Sitefinity.Libraries.Model.Image',
             skipKey = 'skip',
-            takeKey = 'take';
+            takeKey = 'take',
+            filterKey = 'filter',
+            sortKey = 'sortExpression';
 
         var emptyGuid = '00000000-0000-0000-0000-000000000000',
             defaultAlbumId = '4ba7ad46-f29b-4e65-be17-9bf7ce5ba1fb', // TODO: hardcoded until I make album selector
@@ -156,77 +158,74 @@
             query: function (options) {
 
                 var settings = options || {},
-                    defaultTake = 20;
+                    getUrl = imageServiceUrl,
+                    publicFilter = '(Visible=true AND Status=Live)',
+                    skip = settings.skip,
+                    take = settings.take || 20,
+                    filter = settings.filter,
+                    isNamedFiltering = typeof filter !== 'string',
+                    namedFilters = {
+                        all: publicFilter,
+                        recent: '[ShowRecentLiveItems]',
+                        mine: publicFilter + ' AND (Owner = (' + serverData.get('currentUserId') + '))'
+                    },
+                    sort = settings.sort,
+                    isNamedSorting = typeof sort !== 'string',
+                    namedSorts = {
+                        newUploadedFirst: 'DateCreated DESC',
+                        newModifiedFirst: 'LastModified DESC',
+                        titleAtoZ: 'Title ASC',
+                        titleZtoA: 'Title DESC'
+                    };
 
+                var addQueryKey = function (key, value) {
+                    if (!value) {
+                        return;
+                    }
 
-                var getUrl = imageServiceUrl;
+                    var delimiter = (getUrl.indexOf('?') > -1) ? '&' : '?';
+                    getUrl += delimiter + key + '=' + value;
+                };
 
-                // specify item type
-                getUrl += '?' + itemTypeKey + '=' + imageItemType;
+                // set item type
+                addQueryKey(itemTypeKey, imageItemType);
 
                 // specify skip
-                if (settings.skip) {
-                    getUrl += '&' + skipKey + '=' + settings.skip;
-                }
+                addQueryKey(skipKey, skip);
 
                 // specify take
-                getUrl += '&' + takeKey + '=' + (settings.take || defaultTake);
+                addQueryKey(takeKey, take);
 
                 // specify the filter
-                var publicFilter = '(Visible=true AND Status=Live)';
-                var setNamedFilter = function () {
-                    switch (settings.filter.name) {
-                        case 'all':
-                            getUrl += '&filter=' + publicFilter;
-                            break;
-                        case 'recent':
-                            getUrl += '&filter=[ShowRecentLiveItems]';
-                            break;
-                        case 'mine':
-                            getUrl += '&filter=' + publicFilter + ' AND (Owner = (' + serverData.get('currentUserId') + '))';
-                            break;
-                        default:
-                            throw new Error('The named filter "' + settings.filter.name + '" is not supported.');
+                var getFilterExpression = function () {
+
+                    if (!filter) return publicFilter;
+
+                    if (isNamedFiltering) {
+                        if (!namedFilters[filter.name]) {
+                            throw new Error('The named filter "' + filter.name + '" is not supported.');
+                        }
+                        return namedFilters[filter.name];
                     }
+
+                    return publicFilter + ' AND (' + filter + ')';
                 };
 
-                if (settings.filter) {
-                    if (typeof settings.filter === 'string') {
-                        getUrl += '&filter=' + publicFilter + ' AND (' + settings.filter + ')';
-                    } else {
-                        setNamedFilter();
-                    }
-                } else {
-                    getUrl += '&filter=' + publicFilter;
-                }
+                addQueryKey(filterKey, getFilterExpression());
 
                 // specify sort
-                var setNamedSort = function () {
-                    switch (settings.sort.name) {
-                        case 'newUploadedFirst':
-                            getUrl += '&sortExpression=DateCreated DESC';
-                            break;
-                        case 'newModifiedFirst':
-                            getUrl += '&sortExpression=LastModified DESC';
-                            break;
-                        case 'titleAtoZ':
-                            getUrl += '&sortExpression=Title ASC';
-                            break;
-                        case 'titleZtoA':
-                            getUrl += '&sortExpression=Title DESC';
-                            break;
-                        default:
-                            throw new Error('The named sort expression "' + settings.sort.name + '" is not supported.');
+                var getSortExpression = function () {
+                    if (isNamedSorting) {
+                        if (!namedSorts[sort.name]) {
+                            throw new Error('The named sort expression "' + sort.name + '" is not supported.');
+                        }
+                        return namedSorts[sort.name];
                     }
+                    return sort;
                 };
 
-                if (settings.sort) {
-                    if (typeof settings.sort === 'string') {
-                        getUrl += '&sortExpression=' + settings.sort;
-                    } else {
-                        setNamedSort();
-                    }
-                    
+                if (sort) {
+                    addQueryKey(sortKey, getSortExpression());
                 }
 
                 return $http.get(getUrl);

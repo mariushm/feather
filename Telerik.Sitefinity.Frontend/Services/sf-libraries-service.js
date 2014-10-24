@@ -176,6 +176,9 @@
                 var publicFilter = '(Visible=true AND Status=Live)';
                 var setNamedFilter = function () {
                     switch (settings.filter.name) {
+                        case 'all':
+                            getUrl += '&filter=' + publicFilter;
+                            break;
                         case 'recent':
                             getUrl += '&filter=[ShowRecentLiveItems]';
                             break;
@@ -183,8 +186,7 @@
                             getUrl += '&filter=' + publicFilter + ' AND (Owner = (' + serverData.get('currentUserId') + '))';
                             break;
                         default:
-                            getUrl += '&filter=' + publicFilter;
-                            break;
+                            throw new Error('The named filter "' + settings.filter.name + '" is not supported.');
                     }
                 };
 
@@ -196,6 +198,35 @@
                     }
                 } else {
                     getUrl += '&filter=' + publicFilter;
+                }
+
+                // specify sort
+                var setNamedSort = function () {
+                    switch (settings.sort.name) {
+                        case 'newUploadedFirst':
+                            getUrl += '&sortExpression=DateCreated DESC';
+                            break;
+                        case 'newModifiedFirst':
+                            getUrl += '&sortExpression=LastModified DESC';
+                            break;
+                        case 'titleAtoZ':
+                            getUrl += '&sortExpression=Title ASC';
+                            break;
+                        case 'titleZtoA':
+                            getUrl += '&sortExpression=Title DESC';
+                            break;
+                        default:
+                            throw new Error('The named sort expression "' + settings.sort.name + '" is not supported.');
+                    }
+                };
+
+                if (settings.sort) {
+                    if (typeof settings.sort === 'string') {
+                        getUrl += '&sortExpression=' + settings.sort;
+                    } else {
+                        setNamedSort();
+                    }
+                    
                 }
 
                 return $http.get(getUrl);

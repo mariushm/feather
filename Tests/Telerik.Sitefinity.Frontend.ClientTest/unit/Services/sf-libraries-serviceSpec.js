@@ -116,6 +116,138 @@
 
             });
 
+            describe('#namedFilter: "all"', function () {
+                
+                it('makes a request with a named filter, no other settings', function () {
+                    
+                    var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)';
+                    $httpBackend.expectGET(serviceUrl).respond([]);
+
+                    // call the query method with no options
+                    service.query();
+
+                    $httpBackend.flush();
+
+                });
+
+            });
+
+            describe('#namedFilter: unsupported', function () {
+
+                it('throws an exception', function () {
+                    
+                    var queryOptions = {
+                        filter: {
+                            name: 'blahblah'
+                        }
+                    };
+
+                    // call the query method with invalid named filter
+                    expect(function () {
+                        service.query(queryOptions);
+                    }).toThrow(new Error('The named filter "' + queryOptions.filter.name + '" is not supported.'));
+
+                });
+
+            });
+
+            it('makes a request with a string sorting options', function () {
+
+                var queryOptions = {
+                    sort: 'Title ASC'
+                };
+
+                var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)&sortExpression=Title ASC';
+                $httpBackend.expectGET(serviceUrl).respond([]);
+                
+                service.query(queryOptions);
+
+                $httpBackend.flush();
+
+            });
+
+            it('makes a request with a "newUploadedFirst" named sort expression', function () {
+                
+                var queryOptions = {
+                    sort: {
+                        name: 'newUploadedFirst'
+                    }
+                };
+
+                var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)&sortExpression=DateCreated DESC';
+                $httpBackend.expectGET(serviceUrl).respond([]);
+                
+                service.query(queryOptions);
+
+                $httpBackend.flush();
+
+            });
+
+            it('makes a request with a "newModifiedFirst" named sort expression', function () {
+                
+                var queryOptions = {
+                    sort: {
+                        name: 'newModifiedFirst'
+                    }
+                };
+
+                var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)&sortExpression=LastModified DESC';
+                $httpBackend.expectGET(serviceUrl).respond([]);
+                
+                service.query(queryOptions);
+
+                $httpBackend.flush();
+
+            });
+
+            it('makes a request with a "titleAtoZ" named sort expression', function () {
+                
+                var queryOptions = {
+                    sort: {
+                        name: 'titleAtoZ'
+                    }
+                };
+
+                var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)&sortExpression=Title ASC';
+                $httpBackend.expectGET(serviceUrl).respond([]);
+                
+                service.query(queryOptions);
+
+                $httpBackend.flush();
+
+            });
+
+            it('makes a request with a "titleZtoA" named sort expression', function () {
+                
+                var queryOptions = {
+                    sort: {
+                        name: 'titleZtoA'
+                    }
+                };
+
+                var serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)&sortExpression=Title DESC';
+                $httpBackend.expectGET(serviceUrl).respond([]);
+                
+                service.query(queryOptions);
+
+                $httpBackend.flush();
+
+            });
+
+            it('throws an expection when an unsupported named sort expression is used', function () {
+                
+                var queryOptions = {
+                    sort: {
+                        name: 'boohoo'
+                    }
+                };
+                
+                expect(function () {
+                    service.query(queryOptions);
+                }).toThrow(new Error('The named sort expression "' + queryOptions.sort.name + '" is not supported.'));
+
+            });
+
         });
 
     });

@@ -3,6 +3,7 @@
     var $httpBackend,
         $compile,
         serverDataMock,
+        modes,
         imageService;
 
     beforeEach(module('serverDataModule'))
@@ -13,6 +14,7 @@
         $httpBackend = $injector.get('$httpBackend');
         $compile = $injector.get('$compile');
         imageService = $injector.get('sfImageService');
+        modes = $injector.get('sfImageSelectorModes');
         serverDataMock = $injector.get('serverData');
     }));
 
@@ -28,6 +30,21 @@
         beforeEach(inject(function ($rootScope) {
             scope = $rootScope.$new();
         }));
+
+        it('should define "list" as an active mode on initialization', function () {
+
+            $httpBackend.expectGET('/Frontend-Assembly/Telerik.Sitefinity.Frontend/Selectors/image-selector.html')
+                        .respond('<div></div>');
+
+            var element = angular.element('<sf-image-selector></sf-image-selector>'),
+                directive = $compile(element)(scope);
+
+            scope.$digest();
+            $httpBackend.flush();
+
+            expect(scope.activeMode.name).toEqual('list');
+
+        });
 
         it('should subscribe to "ImageSelected" event, set the $scope.image to selected image and switch to insert mode', function () {
 
@@ -91,7 +108,7 @@
 
         });
 
-        it('raises CloseDialog event when CancelSelect command is fired', function () {
+        it('raises CloseDialog event when Cancel command is fired', function () {
 
             var ctrl = createController();
 
@@ -147,6 +164,30 @@
             // items from the second request
             expect(scope.listItems.length).toEqual(20);
         })
+
+        it('changes the list mode ok button title to "Done selecting" when filter is applied', function () {
+
+            var ctrl = createController();
+
+            scope.$digest();
+
+            // by default, list has no filter applied and is in upload
+            // mode, so the title of the okButton should be 'Done'
+            expect(modes.list.okButton.title).toEqual('Done');
+
+            // setting the listFilter to anything (e.g. 'recent')
+            // other than null, should change the title of the
+            // list mode ok button to 'Done selecting'. Keep in mind that
+            // setting a filter will trigger an http request, so we need
+            // to take care of that as well
+            var requestUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=[ShowRecentLiveItems]';
+            $httpBackend.expectGET(requestUrl).respond([]);
+            scope.listFilter = 'recent';
+            $httpBackend.flush();
+
+            expect(modes.list.okButton.title).toEqual('Done selecting');
+
+        });
 
         var filterTest = function (filter, loadedItemsCount, expectedUrl) {
 

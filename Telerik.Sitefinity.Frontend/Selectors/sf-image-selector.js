@@ -4,64 +4,13 @@
 
     var selectors = angular.module('selectors');
 
-    var LIST_MODE = 'list',
-        UPLOAD_MODE = 'upload',
-        UPLOADING_MODE = 'uploading',
-        INSERT_MODE = 'insert';
-
-    var modes = [];
-    modes[LIST_MODE] = {
-        name: LIST_MODE,
-        title: 'Select image',
-        okButton: {
-            title: 'Done',
-            raise: 'DoneSelecting'
-        },
-        cancelButton: {
-            title: 'Cancel',
-            raise: 'CancelSelect'
-        }
-    };
-
-    modes[UPLOAD_MODE] = {
-        name: UPLOAD_MODE,
-        title: 'Upload image',
-        okButton: {
-            title: 'Upload',
-            raise: 'UploadImage'
-        },
-        cancelButton: {
-            title: 'Cancel',
-            raise: 'CancelUpload'
-        }
-    };
-
-    modes[UPLOADING_MODE] = {
-        name: UPLOADING_MODE,
-        title: 'Upload image',
-        cancelButton: {
-            title: 'Cancel',
-            raise: 'CancelUploading'
-        }
-    };
-
-    modes[INSERT_MODE] = {
-        name: INSERT_MODE,
-        title: 'Image',
-        okButton: {
-            title: 'Done',
-            raise: 'InsertImage'
-        },
-        cancelButton: {
-            title: 'Cancel',
-            raise: 'CancelInsert'
-        }
-    };
-
     /*
      * Provides functionality for the list mode of the image selector.
      */
-    imageSelector.controller('sfImageSelectorListCtrl', ['$scope', 'sfImageService', function ($scope, sfImageService) {
+    imageSelector.controller('sfImageSelectorListCtrl', function ($scope, $injector) {
+
+        var imageService = $injector.get('sfImageService'),
+            modes = $injector.get('sfImageSelectorModes');
 
         /*
          * Loads items through the sfImageService. For paging, take is default
@@ -78,7 +27,7 @@
                 }
             };
 
-            sfImageService.query(queryOptions)
+            imageService.query(queryOptions)
                 .then(
                     // success
                     function (result) {
@@ -125,16 +74,23 @@
         };
 
         /*
-         * Watches the listFilter property. If the list property is set to 
+         * Watches the listFilter property. If the list property is set to a value
+         * it means the list should be displayed with some sort of a filter, otherwise
+         * we will be displaying the upload screen of the list mode. The distinction
+         * is also the title of the okButton, which is different for list and upload
+         * screen. 
          */
         $scope.$watch('listFilter', function (newValue, oldValue) {
             if (newValue) {
+                modes.list.okButton.title = 'Done selecting';
                 // clean the list items array only if there was
                 // an existing filter there
                 if (oldValue !== newValue) {
                     $scope.listItems = [];
                 }
                 $scope.loadItems();
+            } else {
+                modes.list.okButton.title = 'Done';
             }
         });
 
@@ -142,7 +98,7 @@
          * Subscribe to the ok command of the list mode so that we can handle
          * it.
          */
-        $scope.$on(modes[LIST_MODE].okButton.raise, function () {
+        $scope.$on(modes.list.okButton.raise, function () {
             // When ok command for the list mode is fired, we need
             // to rise the ImageSelected event so that it can be 
             // handled up the chain. Also send the selected item
@@ -154,19 +110,22 @@
          * Subscribe to the cancel command of the list mode so that we can handle
          * it.
          */
-        $scope.$on(modes[LIST_MODE].cancelButton.raise, function () {
+        $scope.$on(modes.list.cancelButton.raise, function () {
             // When cancel command for list mode is fired, we need
             // to rise the Cancel event so that it can be handled 
             // up the chain
             $scope.$emit('Cancel');
         });
 
-    }]);
+    });
 
     /*
      * Provides functionality for the upload mode of the image selector.
      */
-    imageSelector.controller('sfImageSelectorUploadCtrl', ['$scope', 'sfImageService', function ($scope, sfImageService) {
+    imageSelector.controller('sfImageSelectorUploadCtrl', function ($scope, $injector) {
+
+        var imageService = $injector.get('sfImageService'),
+            modes = $injector.get('sfImageSelectorModes');
 
         $scope.completedPercent = 0;
 
@@ -174,12 +133,12 @@
         $scope.file = null;
 
         // subscribe to the event that starts upload
-        $scope.$on(modes[UPLOAD_MODE].okButton.raise, function (ev, args) {
+        $scope.$on(modes.upload.okButton.raise, function (ev, args) {
 
             // set the active mode to uploading
-            $scope.$parent.activeMode = modes[UPLOADING_MODE];
+            $scope.$parent.activeMode = modes.uploading;
 
-            sfImageService.upload($scope.file).then(
+            imageService.upload($scope.file).then(
                 // success
                 function (data) {
                     $scope.$parent.image = data.ContentItem;
@@ -195,23 +154,26 @@
         });
 
         // subscribes to the event that cancels upload
-        $scope.$on(modes[UPLOAD_MODE].cancelButton.raise, function (ev, args) {
+        $scope.$on(modes.upload.cancelButton.raise, function (ev, args) {
             // set the file to upload to null
             $scope.$parent.file = null;
             // go back to the list mode
-            $scope.$parent.activeMode = modes[LIST_MODE];
+            $scope.$parent.activeMode = modes.list;
         });
 
         $scope.$parent.$watch('file', function (newValue, oldValue) {
             $scope.file = newValue;
         });
 
-    }]);
+    });
 
     /*
      * Provides functionality for the insert mode of the image selector.
      */
-    imageSelector.controller('sfImageSelectorInsertCtrl', ['$scope', '$interpolate', function ($scope, $interpolate) {
+    imageSelector.controller('sfImageSelectorInsertCtrl', function ($scope, $injector) {
+
+        var $interpolate = $injector.get('$interpolate'),
+            modes = $injector.get('sfImageSelectorModes');
 
         $scope.image = {};
 
@@ -226,7 +188,7 @@
         });
 
         // subscribe to the event that inserts an image
-        $scope.$on(modes[INSERT_MODE].okButton.raise, function (ev, args) {
+        $scope.$on(modes.insert.okButton.raise, function (ev, args) {
 
             var markup = '<img src="{{ MediaUrl }}" />';
             markup = $interpolate(markup)($scope.image);
@@ -234,16 +196,19 @@
 
         });
 
-    }]);
+    });
 
     /*
      * This directive represents the Sitefinity Image Selector.
      */
-    imageSelector.directive('sfImageSelector', ['serverContext', function (serverContext) {
+    imageSelector.directive('sfImageSelector', function ($injector) {
+
+        var serverContext = $injector.get('serverContext'),
+            modes = $injector.get('sfImageSelectorModes');
 
         var imageSelectorController = function ($scope) {
 
-            $scope.activeMode = modes[LIST_MODE];
+            $scope.activeMode = modes.list;
 
             $scope.$emit('needsImage', function (e) {
                 
@@ -270,7 +235,7 @@
              */
             $scope.$watch('file', function (newValue, oldValue) {
                 if (newValue) {
-                    $scope.activeMode = modes[UPLOAD_MODE];
+                    $scope.activeMode = modes.upload;
                 }
             });
 
@@ -282,7 +247,7 @@
              */
             $scope.$on('ImageSelected', function (ev, arg) {
                 $scope.image = arg;
-                $scope.activeMode = modes[INSERT_MODE];
+                $scope.activeMode = modes.insert;
             });
 
             /*
@@ -312,74 +277,78 @@
             controller: imageSelectorController
         };
 
-    }]);
+    });
 
     /*
      * Image Selector Modal directive wraps the Image selector in a modal dialog. It is a 
      * convenience thin wrapper which can be used to open the Image Selector in a modal dialog.
      */
-    imageSelector.directive('sfImageSelectorModal', ['$compile', '$parse', 'serverContext', function ($compile, $parse, serverContext) {
+    imageSelector.directive('sfImageSelectorModal', function ($injector) {
 
-        var link = function ($scope, element, attributes) {
+            var $compile = $injector.get('$compile'),
+                $parse = $injector.get('$parse'),
+                serverContext = $injector.get('serverContext'),
+                modes = $injector.get('sfImageSelectorModes');
 
-            var selectorTemplate = serverContext.getEmbeddedResourceUrl('Telerik.Sitefinity.Frontend', 'Selectors/image-selector-modal.html'),
-                directiveMarkup = '<div modal existing-scope="true" window-class="sf-image-selector-dlg" template-url="' + selectorTemplate + '" size="lg"></div>',
-                modalDirective = $compile(directiveMarkup)($scope),
-                editMarkup;
+            var link = function ($scope, element, attributes) {
 
-            // appends the compiled modal directive 
-            var modalElement = $(element).append(modalDirective);
+                var selectorTemplate = serverContext.getEmbeddedResourceUrl('Telerik.Sitefinity.Frontend', 'Selectors/image-selector-modal.html'),
+                    directiveMarkup = '<div modal existing-scope="true" window-class="sf-image-selector-dlg" template-url="' + selectorTemplate + '" size="lg"></div>',
+                    modalDirective = $compile(directiveMarkup)($scope),
+                    editMarkup;
 
-            $scope.$on('needsImage', function (ev, arg) {
-                arg(editMarkup);
-            });
+                // appends the compiled modal directive 
+                var modalElement = $(element).append(modalDirective);
 
-            // Represents the current mode of the Image Selector
-            $scope.mode = modes[LIST_MODE];
+                $scope.$on('needsImage', function (ev, arg) {
+                    arg(editMarkup);
+                });
 
-            // Subscribes to the modeChanged event which is fired by the [child] ImageSelector
-            // controller
-            $scope.$on('modeChanged', function (ev, newMode) {
-                $scope.mode = newMode;
-            });
+                // Represents the current mode of the Image Selector
+                $scope.mode = modes.list;
 
-            //$scope.$on('imageSelected', function (ev, args) {
-            //    $scope.$modalInstance.result.then(function (e) {
-            //        $(element).trigger('imageSelected', e);
-            //    });
-            //    $scope.$modalInstance.close(args);
-            //});
+                // Subscribes to the modeChanged event which is fired by the [child] ImageSelector
+                // controller
+                $scope.$on('modeChanged', function (ev, newMode) {
+                    $scope.mode = newMode;
+                });
 
-            /*
-             * Subscribes to the "Cancel" command which could be fired by any
-             * of the child scopes down the hierarchy. Once this command is fired
-             * the directive will close the itself [the modal].
-             */
-            $scope.$on('Cancel', function (ev, args) {
-                $scope.$modalInstance.close();
-            });
+                //$scope.$on('imageSelected', function (ev, args) {
+                //    $scope.$modalInstance.result.then(function (e) {
+                //        $(element).trigger('imageSelected', e);
+                //    });
+                //    $scope.$modalInstance.close(args);
+                //});
 
-            /*
-             * Opens the image selector modal dialog.
-             */
-            $scope.open = function (markup) {
-                editMarkup = markup;
-                var dialog = angular.element(modalElement).scope().$openModalDialog();
+                /*
+                 * Subscribes to the "Cancel" command which could be fired by any
+                 * of the child scopes down the hierarchy. Once this command is fired
+                 * the directive will close the itself [the modal].
+                 */
+                $scope.$on('Cancel', function (ev, args) {
+                    $scope.$modalInstance.close();
+                });
+
+                /*
+                 * Opens the image selector modal dialog.
+                 */
+                $scope.open = function (markup) {
+                    editMarkup = markup;
+                    var dialog = angular.element(modalElement).scope().$openModalDialog();
+                };
+
+                $scope.command = function (cmd) {
+                    $scope.$broadcast(cmd);
+                };
+
             };
 
-            $scope.command = function (cmd) {
-                $scope.$broadcast(cmd);
+            return {
+                restrict: 'E',
+                link: link
             };
 
-        };
-
-        return {
-            restrict: 'E',
-            link: link
-        };
-
-    }]);
-    
+    });
 
     /*
      * This directive enhances the standard HTML5 file upload (input element) with additional functionality needed
@@ -414,6 +383,58 @@
             link: link
         };
 
+    });
+
+    /*
+     * Defines the modes of the image selector. The reason value recepie
+     * is being used is the fact that some of these properties may be
+     * changed during the runtime.
+     */
+    imageSelector.value('sfImageSelectorModes', {
+        list: {
+            name: 'list',
+            title: 'Select image',
+            okButton: {
+                title: 'Done',
+                raise: 'DoneSelecting'
+            },
+            cancelButton: {
+                title: 'Cancel',
+                raise: 'CancelSelect'
+            }
+        },
+        upload: {
+            name: 'upload',
+            title: 'Upload image',
+            okButton: {
+                title: 'Upload',
+                raise: 'UploadImage'
+            },
+            cancelButton: {
+                title: 'Cancel',
+                raise: 'CancelUpload'
+            }
+        },
+        uploading: {
+            name: 'uploading',
+            title: 'Upload image',
+            cancelButton: {
+                title: 'Cancel',
+                raise: 'CancelUploading'
+            }
+        },
+        insert: {
+            name: 'insert',
+            title: 'Image',
+            okButton: {
+                title: 'Done',
+                raise: 'InsertImage'
+            },
+            cancelButton: {
+                title: 'Cancel',
+                raise: 'CancelInsert'
+            }
+        }
     });
 
 }());

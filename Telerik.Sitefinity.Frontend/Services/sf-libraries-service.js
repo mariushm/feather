@@ -3,12 +3,12 @@
     /*
      * Libraries service provides services for working with images, documents and videos in Sitefinity.
      */
-    var librariesService = angular.module('sfLibrariesService', ['services']);
+    var librariesService = angular.module('sfLibrariesService', ['services', 'serverDataModule']);
 
     /*
      * Image Service provides functionality for working with Sitefinity Images.
      */
-    librariesService.factory('sfImageService', ['$http', '$interpolate', '$q', function ($http, $interpolate, $q) {
+    librariesService.factory('sfImageService', ['$http', '$interpolate', '$q', 'serverData', function ($http, $interpolate, $q, serverData) {
 
         var imageServiceUrl = '/Sitefinity/Services/Content/ImageService.svc/',
             itemTypeKey = 'itemType',
@@ -146,7 +146,10 @@
              * options:
              * skip - The number of items to skip before taking them in resulting dataset; default is 0
              * take - The maximum number of items to take in resulting dataset; default is 20
-             * filter - The filter expression to apply when querying; default is null
+             * filter - The filter expression to apply when querying; default is null. It can be either 
+             *          a string or a named filter object. The supported named filters are:
+             *              recent : Returns the last 50 published items
+             *              mine   : Returns only items that are owned by the current user
              * sort - The sort expression to apply when querying; default is null
              * parentLibrary - The parent library within which to query; by default it is null, so it won't be taken into account
              */
@@ -157,29 +160,42 @@
 
 
                 var getUrl = imageServiceUrl;
+
                 // specify item type
                 getUrl += '?' + itemTypeKey + '=' + imageItemType;
+
                 // specify skip
                 if (settings.skip) {
                     getUrl += '&' + skipKey + '=' + settings.skip;
                 }
+
                 // specify take
                 getUrl += '&' + takeKey + '=' + (settings.take || defaultTake);
 
                 // specify the filter
+                var publicFilter = '(Visible=true AND Status=Live)';
+                var setNamedFilter = function () {
+                    switch (settings.filter.name) {
+                        case 'recent':
+                            getUrl += '&filter=[ShowRecentLiveItems]';
+                            break;
+                        case 'mine':
+                            getUrl += '&filter=' + publicFilter + ' AND (Owner = (' + serverData.get('currentUserId') + '))';
+                            break;
+                        default:
+                            getUrl += '&filter=' + publicFilter;
+                            break;
+                    }
+                };
+
                 if (settings.filter) {
                     if (typeof settings.filter === 'string') {
-                        getUrl += '&filter=(Visible=true AND Status=Live)';
-                        getUrl += " AND (" + settings.filter + ')';
+                        getUrl += '&filter=' + publicFilter + ' AND (' + settings.filter + ')';
                     } else {
-                        switch (settings.filter.name) {
-                            case 'recent':
-                                getUrl += '&filter=[ShowRecentLiveItems]';
-                                break;
-                        }
+                        setNamedFilter();
                     }
                 } else {
-                    getUrl += '&filter=(Visible=true AND Status=Live)';
+                    getUrl += '&filter=' + publicFilter;
                 }
 
                 return $http.get(getUrl);

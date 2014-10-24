@@ -4,7 +4,8 @@
     serverDataModule.provider('serverData', function () {
         var serverData = {
             'applicationRoot': '/',
-            'widgetName': 'MockedWidget'
+            'widgetName': 'MockedWidget',
+            'currentUserId' : 5
         };
 
         var serverDataService = {

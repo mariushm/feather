@@ -2,8 +2,10 @@
 
     var $httpBackend,
         $compile,
+        serverDataMock,
         imageService;
 
+    beforeEach(module('serverDataModule'))
     beforeEach(module('sfLibrariesService'));
     beforeEach(module('sfImageSelector'));
 
@@ -11,6 +13,7 @@
         $httpBackend = $injector.get('$httpBackend');
         $compile = $injector.get('$compile');
         imageService = $injector.get('sfImageService');
+        serverDataMock = $injector.get('serverData');
     }));
 
     afterEach(function () {
@@ -172,6 +175,21 @@
                 var filter = 'recent',
                     preloadedItems = 0,
                     expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=[ShowRecentLiveItems]';
+
+                filterTest(filter, preloadedItems, expectedUrl);
+
+            });
+
+        });
+
+        describe('#filter = "mine"', function () {
+
+            it('loads 20 albums and images from service into the listItems array that belong to the current user', function () {
+
+                var filter = 'mine',
+                    currentUserId = serverDataMock.get('currentUserId'),
+                    preloadedItems = 0,
+                    expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live) AND (Owner = (' + currentUserId + '))';
 
                 filterTest(filter, preloadedItems, expectedUrl);
 

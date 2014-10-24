@@ -72,15 +72,11 @@
         $scope.loadItems = function () {
 
             var queryOptions = {
-                skip: $scope.listItems.length
+                skip: $scope.listItems.length,
+                filter: {
+                    name: $scope.listFilter
+                }
             };
-            switch ($scope.listFilter) {
-                case 'recent':
-                    queryOptions.filter = {
-                        name: 'recent'
-                    };
-                    break;
-            }
 
             sfImageService.query(queryOptions)
                 .then(

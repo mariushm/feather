@@ -15,10 +15,12 @@
 
     describe('sfImageService', function () {
 
-        var service;
+        var service,
+            injector;
 
-        beforeEach(inject(function(sfImageService) {
-            service = sfImageService;
+        beforeEach(inject(function ($injector) {
+            injector = $injector;
+            service = injector.get('sfImageService');
         }));
 
         describe('#query', function () {
@@ -66,21 +68,51 @@
 
             });
 
-            it('makes a request with a named filter, no other settings', function () {
+            describe('#namedFilter: "recent"', function () {
 
-                var queryOptions = {
-                    filter: {
-                        name: 'recent'
-                    }
-                },
-                serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=[ShowRecentLiveItems]';
+                it('makes a request with a named filter, no other settings', function () {
 
-                $httpBackend.expectGET(serviceUrl).respond([]);
+                    var queryOptions = {
+                        filter: {
+                            name: 'recent'
+                        }
+                    },
+                    serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=[ShowRecentLiveItems]';
 
-                // call the query method with options
-                service.query(queryOptions);
+                    $httpBackend.expectGET(serviceUrl).respond([]);
 
-                $httpBackend.flush();
+                    // call the query method with options
+                    service.query(queryOptions);
+
+                    $httpBackend.flush();
+
+                });
+
+            });
+
+            describe('#namedFilter: "mine"', function () {
+
+                it('makes a request with a named filter, no other settings', function () {
+
+                    var userId = '5';
+
+                    var queryOptions = {
+                        filter: {
+                            name: 'mine'
+                        }
+                    },
+                    serviceUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live) AND (Owner = (' + userId + '))';
+
+                    $httpBackend.expectGET(serviceUrl).respond([]);
+
+                    service = injector.get('sfImageService')
+
+                    // call the query method with options
+                    service.query(queryOptions);
+
+                    $httpBackend.flush();
+
+                });
 
             });
 

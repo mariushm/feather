@@ -129,9 +129,12 @@
          */
         $scope.$watch('listFilter', function (newValue, oldValue) {
             if (newValue) {
+                // clean the list items array only if there was
+                // an existing filter there
+                if (oldValue !== newValue) {
+                    $scope.listItems = [];
+                }
                 $scope.loadItems();
-            } else {
-                $scope.items = [];
             }
         });
 

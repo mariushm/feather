@@ -118,6 +118,36 @@
 
         });
 
+        it('clears the listItems array if the filter has been changed', function () {
+
+            var fakeData = {
+                Items: []
+            };
+            for (var i = 0; i < 20; i++) {
+                fakeData.Items.push(i);
+            }
+
+            var firstFilter = 'all',
+                firstRequestUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)',
+                secondFilter = 'recent',
+                secondRequestUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=[ShowRecentLiveItems]';
+
+            var ctrl = createController();
+
+            $httpBackend.expectGET(firstRequestUrl).respond(fakeData);
+            scope.listFilter = firstFilter;
+            $httpBackend.flush();
+
+            $httpBackend.expectGET(secondRequestUrl).respond(fakeData);
+            scope.listFilter = secondFilter;
+            $httpBackend.flush();
+                        
+            // even though we will load 40 items, because filter is being changed
+            // we clean the first 20 items, so we should end up only with the 20
+            // items from the second request
+            expect(scope.listItems.length).toEqual(20);
+        })
+
         var filterTest = function (filter, loadedItemsCount, expectedUrl) {
 
             var fakeData = {

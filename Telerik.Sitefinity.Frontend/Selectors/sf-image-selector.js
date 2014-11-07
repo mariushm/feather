@@ -25,13 +25,13 @@
             if ($scope.listFilter) {
                 queryOptions.filter = {
                     name: $scope.listFilter
-                }
+                };
             }
 
             if ($scope.listSort) {
                 queryOptions.sort = {
                     name: $scope.listSort
-                }
+                };
             }
 
             imageService.query(queryOptions)
@@ -244,10 +244,26 @@
             }
         });
 
+		/**
+		 * Gets the image class attribute.
+		 */
+	    $scope.getImageClass = function() {
+		    switch ($scope.insertOptions.alignment) {
+				case 'left':
+					return ' class="sf-image-left"';
+		    	case 'right':
+		    		return ' class="sf-image-right"';
+		    	case 'center':
+				    return ' class="sf-image-center"';
+		    	default:
+				    return '';
+		    }
+	    };
+
         // subscribe to the event that inserts an image
         $scope.$on(modes.insert.okButton.raise, function (ev, args) {
-            var markup = '<img src="{{ MediaUrl }}" />';
-            markup = $interpolate(markup)($scope.image);
+        	var markup = '<img src="{{ image.MediaUrl }}" alt="{{ image.AlternativeText }}" title="{{ image.Title }}"{{ getImageClass() }} />';
+            markup = $interpolate(markup)($scope);
             $scope.$emit('insertImage', markup);
         });
 

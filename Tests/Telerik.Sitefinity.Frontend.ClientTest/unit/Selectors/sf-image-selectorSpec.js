@@ -357,29 +357,91 @@
 					'$scope' : scope
 				});
 			};
+			createController();
 		});
 
-		it('should emit "insertImage" event when user raises okButton command and send image information as command argument', function() {
-
-			createController();
-
-			var expectedMarkup = '<img src="/images/pic.jpg" />',
-				wasInsertImageRaised = false;
+		var insertTest = function(expectedMarkup)
+	    {
+			var wasInsertImageRaised = false;
 
 			$rootScope.$on('insertImage', function (ev, arg) {
 				expect(arg).toEqual(expectedMarkup);
 				wasInsertImageRaised = true;
 			});
 
-			scope.image = {
-				MediaUrl: '/images/pic.jpg'
-			};
-
 			// emit the insert mode okButton command
 			$rootScope.$broadcast(modes.insert.okButton.raise);
 
 			$rootScope.$digest();
 			expect(wasInsertImageRaised).toBe(true);
+	    }
+
+		it('should emit "insertImage" with Title, Alt, Url and no alignment', function() {
+
+			var expectedMarkup = '<img src="/images/pic.jpg" alt="Image alt" title="Image title" />';
+
+			scope.image = {
+				Title: 'Image title',
+				AlternativeText: 'Image alt',
+				MediaUrl: '/images/pic.jpg'
+			};
+
+			insertTest(expectedMarkup);
+
+		});
+
+		it('should emit "insertImage" with Title, Alt, Url and left alignment', function () {
+
+			var expectedMarkup = '<img src="/images/pic.jpg" alt="Image alt" title="Image title" class="sf-image-left" />';
+
+			scope.insertOptions = {
+				alignment: 'left'
+			};
+
+			scope.image = {
+				Title: 'Image title',
+				AlternativeText: 'Image alt',
+				MediaUrl: '/images/pic.jpg'
+			};
+
+			insertTest(expectedMarkup);
+
+		});
+
+		it('should emit "insertImage" with Title, Alt, Url and left alignment', function () {
+
+			var expectedMarkup = '<img src="/images/pic.jpg" alt="Image alt" title="Image title" class="sf-image-right" />';
+
+			scope.insertOptions = {
+				alignment: 'right'
+			};
+
+			scope.image = {
+				Title: 'Image title',
+				AlternativeText: 'Image alt',
+				MediaUrl: '/images/pic.jpg'
+			};
+
+			insertTest(expectedMarkup);
+
+		});
+
+		it('should emit "insertImage" with Title, Alt, Url and center alignment', function () {
+
+			var expectedMarkup = '<img src="/images/pic.jpg" alt="Image alt" title="Image title" class="sf-image-center" />';
+
+			scope.insertOptions = {
+				alignment: 'center'
+			};
+
+			scope.image = {
+				Title: 'Image title',
+				AlternativeText: 'Image alt',
+				MediaUrl: '/images/pic.jpg'
+			};
+
+			insertTest(expectedMarkup);
+
 		});
 
 	});

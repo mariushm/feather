@@ -1,17 +1,21 @@
 ﻿describe('sfImageSelector', function () {
 
-    var $httpBackend,
+	var $httpBackend,
+		$rootScope,
+		$controller,
         $compile,
+		createController,
+		scope,
         serverDataMock,
         modes,
         imageService;
 
-    beforeEach(module('serverDataModule'))
-    beforeEach(module('sfLibrariesService'));
-    beforeEach(module('sfImageSelector'));
+	beforeEach(module('serverDataModule', 'sfLibrariesService', 'sfImageSelector'));
 
     beforeEach(inject(function ($injector) {
-        $httpBackend = $injector.get('$httpBackend');
+    	$httpBackend = $injector.get('$httpBackend');
+    	$rootScope = $injector.get('$rootScope');
+	    $controller = $injector.get('$controller');
         $compile = $injector.get('$compile');
         imageService = $injector.get('sfImageService');
         modes = $injector.get('sfImageSelectorModes');
@@ -25,39 +29,27 @@
 
     describe('Directive: sfImageSelector', function () {
 
-        var scope;
+    	var element = angular.element('<sf-image-selector></sf-image-selector>');
 
-        beforeEach(inject(function ($rootScope) {
-            scope = $rootScope.$new();
-        }));
+        beforeEach(function () {
+        	scope = $rootScope.$new();
+
+        	$httpBackend.expectGET('/Frontend-Assembly/Telerik.Sitefinity.Frontend/Selectors/image-selector.html')
+                        .respond('<div></div>');
+        	$compile(element)(scope);
+        	scope.$digest();
+        	$httpBackend.flush();
+        });
 
         it('should define "list" as an active mode on initialization', function () {
-
-            $httpBackend.expectGET('/Frontend-Assembly/Telerik.Sitefinity.Frontend/Selectors/image-selector.html')
-                        .respond('<div></div>');
-
-            var element = angular.element('<sf-image-selector></sf-image-selector>'),
-                directive = $compile(element)(scope);
-
-            scope.$digest();
-            $httpBackend.flush();
-
             expect(scope.activeMode.name).toEqual('list');
 
         });
 
         it('should subscribe to "ImageSelected" event, set the $scope.image to selected image and switch to insert mode', function () {
 
-            $httpBackend.expectGET('/Frontend-Assembly/Telerik.Sitefinity.Frontend/Selectors/image-selector.html')
-                        .respond('<div></div>');
-
-            var element = angular.element('<sf-image-selector></sf-image-selector>'),
-                selectedItem = { Title: 'Item 1' },
-                childScope = scope.$new(),
-                directive = $compile(element)(scope);
-
-            scope.$digest();
-            $httpBackend.flush();
+	        var selectedItem = { Title: 'Item 1' },
+		        childScope = scope.$new();
 
             // emit the "ImageSelected" command from child scope
             childScope.$emit('ImageSelected', selectedItem);
@@ -66,18 +58,27 @@
             expect(scope.activeMode.name).toEqual('insert');
         });
 
+	    it('should emit "modeChanged" event when $scope.activeMode is changed', function() {
+
+	    	var newMode = modes.insert,
+	    		wasCalled = false;
+
+		    $rootScope.$on('modeChanged', function(ev, arg) {
+		    	expect(arg.name).toEqual(newMode.name);
+			    wasCalled = true;
+		    });
+
+		    scope.activeMode = newMode;
+		    scope.$digest();
+		    expect(wasCalled).toEqual(true);
+	    });
+
     });
 
     describe('Controller: sfImageSelectorListCtrl', function () {
 
-        var $rootScope,
-            scope,
-            service,
-            createController;
-
-        beforeEach(inject(function ($injector, $controller) {
-
-            $rootScope = $injector.get('$rootScope');
+    	beforeEach(function () {
+            
             scope = $rootScope.$new();
 
             createController = function () {
@@ -86,11 +87,11 @@
                     'sfImageService' : imageService
                 });
             };
-        }));
+        });
 
         it('raises ImageSelected event when DoneSelecting command is fired', function () {
 
-            var ctrl = createController();
+            createController();
 
             scope.selectedItem = {
                 Title: 'Item 1'
@@ -110,7 +111,7 @@
 
         it('raises CloseDialog event when Cancel command is fired', function () {
 
-            var ctrl = createController();
+            createController();
 
             // we'll spy on the emit function to make sure
             // Cancel event is emitted
@@ -126,48 +127,46 @@
 
         it('sets the $scope.selectedItem property when select function is called', function () {
 
-            var ctrl = createController(),
-                item = { Title: 'One' };
-
+        	var item = { Title: 'One' };
+	        createController();
             scope.select(item);
-
             expect(scope.selectedItem).toBe(item);
 
         });
 
-        it('clears the listItems array if the filter has been changed', function () {
+	    it('clears the listItems array if the filter has been changed', function() {
 
-            var fakeData = {
-                Items: []
-            };
-            for (var i = 0; i < 20; i++) {
-                fakeData.Items.push(i);
-            }
+		    var fakeData = {
+			    Items: []
+		    };
+		    for (var i = 0; i < 20; i++) {
+			    fakeData.Items.push(i);
+		    }
 
-            var firstFilter = 'all',
-                firstRequestUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)',
-                secondFilter = 'recent',
-                secondRequestUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=[ShowRecentLiveItems]';
+		    var firstFilter = 'all',
+			    firstRequestUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)&sortExpression=DateCreated DESC',
+			    secondFilter = 'recent',
+			    secondRequestUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=[ShowRecentLiveItems]&sortExpression=DateCreated DESC';
 
-            var ctrl = createController();
+		    createController();
 
-            $httpBackend.expectGET(firstRequestUrl).respond(fakeData);
-            scope.listFilter = firstFilter;
-            $httpBackend.flush();
+		    $httpBackend.expectGET(firstRequestUrl).respond(fakeData);
+		    scope.listFilter = firstFilter;
+		    $httpBackend.flush();
 
-            $httpBackend.expectGET(secondRequestUrl).respond(fakeData);
-            scope.listFilter = secondFilter;
-            $httpBackend.flush();
-                        
-            // even though we will load 40 items, because filter is being changed
-            // we clean the first 20 items, so we should end up only with the 20
-            // items from the second request
-            expect(scope.listItems.length).toEqual(20);
-        })
+		    $httpBackend.expectGET(secondRequestUrl).respond(fakeData);
+		    scope.listFilter = secondFilter;
+		    $httpBackend.flush();
+
+		    // even though we will load 40 items, because filter is being changed
+		    // we clean the first 20 items, so we should end up only with the 20
+		    // items from the second request
+		    expect(scope.listItems.length).toEqual(20);
+	    });
 
         it('changes the list mode ok button title to "Done selecting" when filter is applied', function () {
 
-            var ctrl = createController();
+            createController();
 
             scope.$digest();
 
@@ -180,7 +179,7 @@
             // list mode ok button to 'Done selecting'. Keep in mind that
             // setting a filter will trigger an http request, so we need
             // to take care of that as well
-            var requestUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=[ShowRecentLiveItems]';
+            var requestUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=[ShowRecentLiveItems]&sortExpression=DateCreated DESC';
             $httpBackend.expectGET(requestUrl).respond([]);
             scope.listFilter = 'recent';
             $httpBackend.flush();
@@ -200,12 +199,12 @@
             
             $httpBackend.expectGET(expectedUrl).respond(fakeData);
 
-            var ctrl = createController();
+            createController();
 
             scope.listItems = [];
             // preload items in the scope to test paging with skip
-            for (var i = 0; i < loadedItemsCount; i++) {
-                scope.listItems.push(i);
+            for (var x = 0; x < loadedItemsCount; x++) {
+                scope.listItems.push(x);
             }
 
             scope.listFilter = filter;
@@ -222,7 +221,7 @@
                 
                 var filter = 'all',
                     preloadedItems = 0,
-                    expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)';
+                    expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)&sortExpression=DateCreated DESC';
 
                 filterTest(filter, preloadedItems, expectedUrl);
 
@@ -232,7 +231,7 @@
 
                 var filter = 'all',
                     preloadedItems = 20,
-                    expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&skip=20&take=20&filter=(Visible=true AND Status=Live)';
+                    expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&skip=20&take=20&filter=(Visible=true AND Status=Live)&sortExpression=DateCreated DESC';
 
                 filterTest(filter, preloadedItems, expectedUrl);
 
@@ -245,7 +244,7 @@
 
                 var filter = 'recent',
                     preloadedItems = 0,
-                    expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=[ShowRecentLiveItems]';
+                    expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=[ShowRecentLiveItems]&sortExpression=DateCreated DESC';
 
                 filterTest(filter, preloadedItems, expectedUrl);
 
@@ -260,7 +259,7 @@
                 var filter = 'mine',
                     currentUserId = serverDataMock.get('currentUserId'),
                     preloadedItems = 0,
-                    expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live) AND (Owner = (' + currentUserId + '))';
+                    expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live) AND (Owner = (' + currentUserId + '))&sortExpression=DateCreated DESC';
 
                 filterTest(filter, preloadedItems, expectedUrl);
 
@@ -268,39 +267,173 @@
 
         });
 
+        describe('#sorting', function () {
+
+            var sortTest = function (namedSort, expectedUrl) {
+                var fakeData = {
+                    Items: []
+                };
+                for (var i = 0; i < 20; i++) {
+                    fakeData.Items.push(i);
+                }
+
+                $httpBackend.expectGET(expectedUrl).respond(fakeData);
+
+                createController();
+
+                scope.listItems = [];
+
+                // preload items in the scope to test that list will be cleared
+                // on change of listSort
+                for (var x = 0; x < 22; x++) {
+                    scope.listItems.push(x);
+                }
+
+                scope.$digest();
+
+                scope.listSort = namedSort;
+
+                $httpBackend.flush();
+
+                expect(scope.listItems.length).toEqual(20);
+            };
+
+            
+            it('clears the listItems and orders items by DateCreated descending when listSort set to "newUploadedFirst"', function () {
+
+                // newUploadedFirst is a default value, so we first have to change to some other sort
+                // to be able to test
+
+                var expectedUrl1 = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)&sortExpression=LastModified DESC',
+                    namedSort1 = 'newModifiedFirst';
+
+                sortTest(namedSort1, expectedUrl1);
+
+                var expectedUrl2 = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)&sortExpression=DateCreated DESC',
+                    namedSort2 = 'newUploadedFirst';
+
+                sortTest(namedSort2, expectedUrl2);
+
+            });
+            
+
+            it('clears the listItems and orders items by LastModified descending when listSort set to "newModifiedFirst"', function () {
+                
+                var expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)&sortExpression=LastModified DESC',
+                    namedSort = 'newModifiedFirst';
+
+                sortTest(namedSort, expectedUrl);
+
+            });
+
+            it('clears the listItems and orders items by Title ascending when listSort set to "titleAtoZ"', function () {
+                
+                var expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)&sortExpression=Title ASC',
+                    namedSort = 'titleAtoZ';
+
+                sortTest(namedSort, expectedUrl);
+
+            });
+
+            it('clears the listItems and orders items by Title descending when listSort set to "titleZtoA"', function () {
+                
+                var expectedUrl = '/Sitefinity/Services/Content/ImageService.svc/?itemType=Telerik.Sitefinity.Libraries.Model.Image&take=20&filter=(Visible=true AND Status=Live)&sortExpression=Title DESC',
+                    namedSort = 'titleZtoA';
+
+                sortTest(namedSort, expectedUrl);
+
+            });
+
+        });
+
     });
+
+    describe('Controller: sfImageSelectorInsertCtrl', function () {
+
+		beforeEach(function() {
+			scope = $rootScope.$new();
+			createController = function() {
+				return $controller('sfImageSelectorInsertCtrl', {
+					'$scope' : scope
+				});
+			};
+		});
+
+		it('should emit "insertImage" event when user raises okButton command and send image information as command argument', function() {
+
+			createController();
+
+			var expectedMarkup = '<img src="/images/pic.jpg" />',
+				wasInsertImageRaised = false;
+
+			$rootScope.$on('insertImage', function (ev, arg) {
+				expect(arg).toEqual(expectedMarkup);
+				wasInsertImageRaised = true;
+			});
+
+			scope.image = {
+				MediaUrl: '/images/pic.jpg'
+			};
+
+			// emit the insert mode okButton command
+			$rootScope.$broadcast(modes.insert.okButton.raise);
+
+			$rootScope.$digest();
+			expect(wasInsertImageRaised).toBe(true);
+		});
+
+	});
 
     describe('Directive: sfImageSelectorModal', function () {
 
-        var scope;
+    	var element = angular.element('<sf-image-selector-modal></sf-image-selector-modal>'),
+			promiseArg,
+		    modalInstance = {
+			    close: function() {},
+			    result: {
+				    then: function(action) {
+					    action(promiseArg);
+				    }
+			    }
+		    };
 
         beforeEach(inject(function ($injector) {
-            
-            scope = $injector.get('$rootScope');
+
+	        scope = $injector.get('$rootScope');
+	        scope.$modalInstance = modalInstance;
+	        $compile(element)(scope);
+	        scope.$digest();
 
         }));
 
         it('should call scope.$modalInstance.close() when any of the child scopes emits "Cancel" command', function () {
 
-            var element = angular.element('<sf-image-selector-modal></sf-image-selector-modal>'),
-                wasCalled = false;
-
-            scope.$modalInstance = {
-                close: function (arg) {
-                    wasCalled = true;
-                }
-            };
-
-            var childScope = scope.$new();
-
-            var directive = $compile(element)(scope);
-            scope.$digest();
+        	var childScope = scope.$new();
+	        spyOn(modalInstance, 'close');
 
             // emit "Cancel" command from child scope
-            childScope.$emit('Cancel');
-            
-            expect(wasCalled).toBe(true);
+        	childScope.$emit('Cancel');
+
+	        expect(modalInstance.close).toHaveBeenCalled();
         });
+
+	    it('should subscribe to insertImage command, trigger DOM insertImage event on the modal instance and close the modal', function() {
+
+		    var childScope = scope.$new(),
+			    expectedMarkup = '<img src="pic.jpg" />';
+
+			promiseArg = expectedMarkup;
+
+		    spyOn($.fn, 'trigger');
+		    spyOn(modalInstance, 'close');
+
+	    	// emit "insertImage" command from child scope
+	    	childScope.$emit('insertImage', expectedMarkup);
+
+	    	expect(modalInstance.close).toHaveBeenCalled();
+		    scope.$digest();
+		    expect($.fn.trigger).toHaveBeenCalledWith('insertImage', expectedMarkup);
+	    });
 
     });
 

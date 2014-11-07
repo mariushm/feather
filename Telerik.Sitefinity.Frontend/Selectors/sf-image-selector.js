@@ -2,8 +2,6 @@
 
     var imageSelector = angular.module('sfImageSelector', ['sfLibrariesService', 'sfDates', 'sfInfiniteScroll']);
 
-    var selectors = angular.module('selectors');
-
     /*
      * Provides functionality for the list mode of the image selector.
      */
@@ -21,11 +19,20 @@
         $scope.loadItems = function () {
 
             var queryOptions = {
-                skip: $scope.listItems.length,
-                filter: {
+                skip: $scope.listItems.length
+            };
+
+            if ($scope.listFilter) {
+                queryOptions.filter = {
                     name: $scope.listFilter
                 }
-            };
+            }
+
+            if ($scope.listSort) {
+                queryOptions.sort = {
+                    name: $scope.listSort
+                }
+            }
 
             imageService.query(queryOptions)
                 .then(
@@ -42,13 +49,51 @@
 
         /*
          * The predefined filters present in the user interface. Can have following
-         * values
+         * values:
          * null - No filtering, controller should be in upload mode
          * 'recent' - List should display recent items (both images and albums)
          * 'mine' - List should display my items (both images and albums)
          * 'all' - List should display all items (both images and albums)
          */
         $scope.listFilter = null;
+
+        /*
+         * Provides a list of supported sorting options.
+         */
+        $scope.sortOptions = [
+            {
+                title: 'New-uploaded first',
+                name: 'newUploadedFirst'
+            },
+            {
+                title: 'New-modified first',
+                name: 'newModifiedFirst'
+            },
+            {
+                title: 'Title (A-Z)',
+                name: 'titleAtoZ'
+            },
+            {
+                title: 'Title (Z-A)',
+                name: 'titleZtoA'
+            }
+        ];
+
+        /*
+         * The predefined sort expressions present in the user interface. Can have
+         * following values:
+         * null - No sorting
+         * newUploadedFirst - Orders items by DateCreated in descending order
+         * newModifiedFirst - Orders items by LastModified in descending order
+         * titleAtoZ - Orders items by Title in ascending order
+         * titleZtoA - Orders items by Title in descending order
+         */
+        $scope.listSort = $scope.sortOptions[0].name;
+
+        /*
+         * Determines weather sorting and view UI should be displayed.
+         */
+        $scope.showSortingAndView = false;
 
         /*
          * The array of all list items that are to be displayed in the list.
@@ -74,7 +119,7 @@
         };
 
         /*
-         * Watches the listFilter property. If the list property is set to a value
+         * Watches the listFilter property. If the listFilter property is set to a value
          * it means the list should be displayed with some sort of a filter, otherwise
          * we will be displaying the upload screen of the list mode. The distinction
          * is also the title of the okButton, which is different for list and upload
@@ -91,6 +136,18 @@
                 $scope.loadItems();
             } else {
                 modes.list.okButton.title = 'Done';
+            }
+        });
+
+        /*
+         * Watches the listSort property. If the listSort property is set to a value
+         * it means the list should be displayed in a specific order.
+         */
+        $scope.$watch('listSort', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                // sorting should remove all the items already loaded
+                $scope.listItems = [];
+                $scope.loadItems();
             }
         });
 
@@ -172,7 +229,7 @@
      */
     imageSelector.controller('sfImageSelectorInsertCtrl', function ($scope, $injector) {
 
-        var $interpolate = $injector.get('$interpolate'),
+    	var $interpolate = $injector.get('$interpolate'),
             modes = $injector.get('sfImageSelectorModes');
 
         $scope.image = {};
@@ -189,11 +246,9 @@
 
         // subscribe to the event that inserts an image
         $scope.$on(modes.insert.okButton.raise, function (ev, args) {
-
             var markup = '<img src="{{ MediaUrl }}" />';
             markup = $interpolate(markup)($scope.image);
-            $scope.$emit('imageSelected', markup);
-
+            $scope.$emit('insertImage', markup);
         });
 
     });
@@ -265,9 +320,9 @@
              * Watches the active mode in order to be able to emit an event
              * when mode has changed.
              */
-            //$scope.$watch('activeMode', function (newValue, oldValue) {
-            //    $scope.$emit('modeChanged', newValue);
-            //});
+            $scope.$watch('activeMode', function (newValue) {
+                $scope.$emit('modeChanged', newValue);
+            });
 
         };
 
@@ -286,7 +341,6 @@
     imageSelector.directive('sfImageSelectorModal', function ($injector) {
 
             var $compile = $injector.get('$compile'),
-                $parse = $injector.get('$parse'),
                 serverContext = $injector.get('serverContext'),
                 modes = $injector.get('sfImageSelectorModes');
 
@@ -313,12 +367,12 @@
                     $scope.mode = newMode;
                 });
 
-                //$scope.$on('imageSelected', function (ev, args) {
-                //    $scope.$modalInstance.result.then(function (e) {
-                //        $(element).trigger('imageSelected', e);
-                //    });
-                //    $scope.$modalInstance.close(args);
-                //});
+                $scope.$on('insertImage', function (ev, args) {
+                	$scope.$modalInstance.result.then(function (e) {
+                        $(element).trigger('insertImage', e);
+                    });
+                    $scope.$modalInstance.close(args);
+                });
 
                 /*
                  * Subscribes to the "Cancel" command which could be fired by any
@@ -334,7 +388,7 @@
                  */
                 $scope.open = function (markup) {
                     editMarkup = markup;
-                    var dialog = angular.element(modalElement).scope().$openModalDialog();
+                    angular.element(modalElement).scope().$openModalDialog();
                 };
 
                 $scope.command = function (cmd) {

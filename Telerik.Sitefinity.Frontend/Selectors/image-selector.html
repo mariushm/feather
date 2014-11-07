@@ -2,7 +2,7 @@
 <div ng-controller="sfImageSelectorListCtrl" ng-show="activeMode.name === 'list' || activeMode.name === 'list_upload'">
     <div class="row">
         <div class="col-md-8">
-            
+
             <!-- LIST UPLOAD MODE -->
             <div ng-hide="listFilter" class="text-center">
                 <button type="button" class="btn btn-link" ng-click="selectFile()">
@@ -13,14 +13,23 @@
             </div>
 
             <!-- LIST LIST MODE -->
-            <div ng-show="listFilter" sf-infinite-scroll="loadItems()" style="height:300px;">
-                <ul class="sf-image-selector-thumbails">
-                    <li ng-repeat="listItem in listItems">
-                        <a href="" ng-click="select(listItem)" ng-class="(selectedItem.Id === listItem.Id) ? 'selected' : ''">
-                            <img height="71" ng-src="{{ listItem.ThumbnailUrl }}" />
-                        </a>
-                    </li>
-                </ul>
+            <div ng-show="listFilter">
+                <div sf-infinite-scroll="loadItems()" style="height:300px;">
+                    <ul class="sf-image-selector-thumbails">
+                        <li ng-repeat="listItem in listItems">
+                            <a href="" ng-click="select(listItem)" ng-class="(selectedItem.Id === listItem.Id) ? 'selected' : ''">
+                                <img height="71" ng-src="{{ listItem.ThumbnailUrl }}" />
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- SORTING AND VIEW -->
+                <div>
+                    <button type="button" class="btn btn-link" ng-show="!showSortingAndView" ng-click="showSortingAndView = true">Sorting and view</button>
+                    <div ng-show="showSortingAndView">
+                        <select ng-model="listSort" ng-options="sort.name as sort.title for sort in sortOptions"></select>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -71,7 +80,7 @@
 
 <!-- INSERT MODE -->
 <div ng-controller="sfImageSelectorInsertCtrl" ng-show="activeMode.name === 'insert'">
-    
+
     <img ng-src="{{ image.ThumbnailUrl }}" />
 
     <label for="imageType">Type:</label>
@@ -84,7 +93,7 @@
     <span id="uploadDate">{{ image.DateCreated | fromWcfDate | smartDateString }}</span>
 
     <form role="form">
-        
+
         <div class="form-group">
             <label for="imageTitle">Title</label>
             <input id="imageTitle" type="text" ng-model="image.Title" class="form-control" />
@@ -99,7 +108,7 @@
 
         <div class="form-group">
             <label for="imageAlignment">Alignment</label>
-            
+
             <label class="radio-inline">
                 <input type="radio" name="imageAlignment" ng-model="insertOptions.alignment" value="none"> None
             </label>

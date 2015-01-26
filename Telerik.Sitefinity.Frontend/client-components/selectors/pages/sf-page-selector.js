@@ -108,6 +108,21 @@
                             return false;
                         };
 
+                        // Adds support for multilingual support
+                        ctrl.$scope.bindPageIdentifierField = function (dataItem) {
+                            console.log(dataItem);
+                            if (dataItem && dataItem.Title && dataItem.Title.ValuesPerCulture && dataItem.Title.ValuesPerCulture.length > 2) {
+                                var culture = getCulture();
+                                for (var i = 0; i < dataItem.Title.ValuesPerCulture.length; i++) {
+                                    if (dataItem.Title.ValuesPerCulture[i].Key === culture) {
+                                        return dataItem.Title.ValuesPerCulture[i].Value;
+                                    }
+                                }
+                            }
+
+                            return ctrl.bindIdentifierField(dataItem);
+                        };
+
                         ctrl.selectorType = 'PageSelector';
 
                         ctrl.dialogTemplateUrl = 'client-components/selectors/pages/sf-page-selector.html';

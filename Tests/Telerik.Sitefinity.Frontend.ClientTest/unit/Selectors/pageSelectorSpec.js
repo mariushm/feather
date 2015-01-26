@@ -11,9 +11,17 @@ describe("page selector", function () {
     for (var i = 0; i < ITEMS_COUNT; i++) {
         customDataItems.Items[i] = {
             Id: '4c003fb0-2a77-61ec-be54-ff00007864f' + i,
-            Title: { Value: 'Dummy' + i },
             HasChildren: true,
-            Status: "Published"
+            Status: 'Published',
+            Title: {
+                Value: 'Dummy' + i,
+                ValuesPerCulture: [
+                    { Key: 'en', Value: 'titleEN' + i },
+                    { Key: 'de', Value: 'titleDE' + i },
+                    { Key: 'fr', Value: 'titleFR' + i },
+                    { Key: 'bg', Value: 'titleBG' + i }
+                ]
+            }
         };
     }
 
@@ -169,6 +177,31 @@ describe("page selector", function () {
             expect(s.selectedItemsInTheDialog).toBeDefined();
             expect(s.selectedItemsInTheDialog.length).toEqual(filteredCollection.Items.length);
             expect(s.selectedItemsInTheDialog[0].Id).toEqual(filteredCollection.Items[0].Id);
+        });
+
+        it('[dzhenko] / should mark item as selected when the dialog is opened.', function () {
+            var template = "<sf-list-selector sf-page-selector sf-multiselect='true' sf-selected-ids='selectedIds' />";
+
+            var ids = filteredCollection.Items.map(function (item) {
+                return item.Id;
+            });
+
+            scope.selectedIds = ids;
+
+            scope.getCulture = function () {
+                return "fr";
+            }
+
+            commonMethods.compileDirective(template, scope);
+
+            $('.openSelectorBtn').click();
+
+            //The scope of the selector is isolated, but it's child of the scope used for compilation.
+            var s = scope.$$childHead;
+            debugger;
+            expect(s.selectedItemsInTheDialog).toBeDefined();
+            var title = $('.treeitem span.k-in span').first().html();
+            expect(title).toEqual("titleFR0");
         });
     });
 });

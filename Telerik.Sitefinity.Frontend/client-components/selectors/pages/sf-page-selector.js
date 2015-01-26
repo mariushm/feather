@@ -110,7 +110,6 @@
 
                         // Adds support for multilingual support
                         ctrl.$scope.bindPageIdentifierField = function (dataItem) {
-                            console.log(dataItem);
                             if (dataItem && dataItem.Title && dataItem.Title.ValuesPerCulture && dataItem.Title.ValuesPerCulture.length > 2) {
                                 var culture = getCulture();
                                 for (var i = 0; i < dataItem.Title.ValuesPerCulture.length; i++) {

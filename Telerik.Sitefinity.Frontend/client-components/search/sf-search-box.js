@@ -20,7 +20,7 @@
                     scope.showSuggestions = false;
                     scope.suggestions = [];
 
-                    if (!scope.sfAction)
+                    if (!attrs.sfAction)
                         scope.showError = true;
 
                     if (!scope.sfMinTextLength)

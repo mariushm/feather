@@ -5,6 +5,7 @@ describe('libraries breadcrumb in image selector', function () {
 
     var $rootScope;
     var $q;
+    var mediaFilter;
 
     beforeEach(module(function ($provide) {
         $provide.value('sfMediaService', fakeMediaService);
@@ -12,10 +13,11 @@ describe('libraries breadcrumb in image selector', function () {
         $provide.value('sfHierarchicalTaxonService', fakeHierarchicalTaxonService);
     }));
 
-    beforeEach(inject(function (_$rootScope_, _$q_) {
+    beforeEach(inject(function (_$rootScope_, _$q_, sfMediaFilter) {
         //Build the scope with whom the directive will be compiled.
         $rootScope = _$rootScope_;
         $q = _$q_;
+        mediaFilter = sfMediaFilter;
     }));
 
     var itemsPromiseTransform = function (items) {
@@ -50,18 +52,6 @@ describe('libraries breadcrumb in image selector', function () {
     };
 
     var fakeMediaService = {
-        newFilter: function () {
-            return {
-                composeExpression: function() {
-                    
-                },
-                taxon: {
-                    composeExpression: function() {
-                    
-                    }    
-                }
-            };
-        },
         images: {
             getFolders: function (options) {
                 return itemsPromiseTransform(genericGet());
@@ -73,6 +63,11 @@ describe('libraries breadcrumb in image selector', function () {
                 return itemsPromiseTransform(genericGet());
             },
             getPredecessorsFolders: function (options) {
+                var defer = $q.defer();
+                defer.resolve(genericGet());
+                return defer.promise;
+            },
+            get: function (options, filterObject, appendItems) {
                 var defer = $q.defer();
                 defer.resolve(genericGet());
                 return defer.promise;
@@ -100,8 +95,8 @@ describe('libraries breadcrumb in image selector', function () {
         var s = scope.$$childHead;
 
         // select filter by library
-        s.filterObject = fakeMediaService.newFilter();
-        s.filterObject.parent = 'some Id';
+        s.filterObject = mediaFilter.newFilter();
+        s.filterObject.set.parent.to('some Id');
 
         s.$digest();
 
@@ -118,15 +113,14 @@ describe('libraries breadcrumb in image selector', function () {
         var s = scope.$$childHead;
 
         // select filter by library
-        s.filterObject = fakeMediaService.newFilter();
-        s.filterObject.parent = 'some Id';
+        s.filterObject = mediaFilter.newFilter();
+        s.filterObject.set.parent.to('some Id');
 
         s.$digest();
 
         // simulate click on the breadcrumb item
         var bcItem = s.breadcrumbs[1];
         s.onBreadcrumbItemClick(bcItem);
-
         expect(s.filterObject.parent).toEqual(bcItem.Id);
     });
 });

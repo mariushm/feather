@@ -134,8 +134,8 @@
                     };
 
                     scope.onBreadcrumbItemClick = function (item) {
-                        var filter = sfMediaService.newFilter();
-                        filter.parent = item && item.Id ? item.Id : filter.parent;
+                        var filter = sfMediaFilter.newFilter();
+                        filter.set.parent.to(item && item.Id ? item.Id : filter.parent);
                         scope.sortExpression = null;
                         scope.filterObject = filter;
                     };

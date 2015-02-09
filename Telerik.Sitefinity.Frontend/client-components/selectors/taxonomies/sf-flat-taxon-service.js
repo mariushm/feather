@@ -18,14 +18,14 @@
                 return serviceHelper.getResource(url);
             };
 
-            var putResource = function (taxonomyId) {
+            var putResource = function (taxonomyId, provider, itemType) {
                 var url;
                 if (taxonomyId && taxonomyId !== "") {
                     url = serviceUrl + taxonomyId + '/';
                 }
                 url += "ensure/";
 
-                return serviceHelper.getResource(url, null, null, true);
+                return serviceHelper.getResource(url, provider, itemType, true);
             };
 
             var getTaxons = function (taxonomyId, skip, take, search, frontendLanguages) {
@@ -70,7 +70,7 @@
             };
 
             var addTaxa = function (taxonomyId, provider, itemType, taxonTitles) {
-                dataItemPromise = putResource(taxonomyId).put(taxonTitles).$promise;
+                dataItemPromise = putResource(taxonomyId, provider, itemType).put(taxonTitles).$promise;
 
                 return dataItemPromise;
             };

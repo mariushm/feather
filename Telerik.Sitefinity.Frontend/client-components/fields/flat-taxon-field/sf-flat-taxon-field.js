@@ -9,7 +9,8 @@
             scope: {
                 sfModel: '=',
                 sfTaxonomyId: '@',
-                sfEnableAutoComplete: '@'
+                sfEnableAutoComplete: '@',
+                sfProvider: '@'
             },
             templateUrl: function (elem, attrs) {
                 var assembly = attrs.sfTemplateAssembly || 'Telerik.Sitefinity.Frontend';
@@ -57,7 +58,7 @@
 
                 scope.taxonAdded = function (newTaxon) {
                     if (newTaxon) {
-                        taxonService.addTaxa(scope.sfTaxonomyId, null, null, [newTaxon.Title])
+                        taxonService.addTaxa(scope.sfTaxonomyId, scope.sfProvider, null, [newTaxon.Title])
                             .then(function (data) {
                                 if (data && data.length > 0) {
                                     newTaxon.Id = data[0].Id;
